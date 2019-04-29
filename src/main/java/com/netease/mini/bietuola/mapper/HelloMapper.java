@@ -14,7 +14,7 @@ import java.util.List;
 public interface HelloMapper {
 
     // 可以自己写sql在注解中，不需要在xml中写
-    @Select("SELECT id, name, age, price, create_time, day FROM hello WHERE name = #{name}")
+    @Select("SELECT id, name, age, price, create_time AS createTime, day,role FROM hello WHERE name = #{name}")
     List<Hello> getHelloByName(String name);
 
     // 可以在xml中写好对应名字的sql操作
