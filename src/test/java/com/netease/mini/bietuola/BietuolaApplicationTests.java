@@ -56,5 +56,11 @@ public class BietuolaApplicationTests {
         PageInfo<Hello> result = new PageInfo<>(lists);
         System.out.println(result);
     }
+    @Test
+    public void testfindByName(){
+	    System.out.println(helloMapper.getHelloByName("tom"));
+
+
+    }
 
 }
