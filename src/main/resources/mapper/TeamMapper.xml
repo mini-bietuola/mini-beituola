@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.netease.mini.bietuola.mapper.TeamMapper">
+
+    <resultMap type="com.netease.mini.bietuola.entity.Team" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="avatarUrl" column="avatar_url"/>
+        <result property="imgUrl" column="img_url"/>
+        <result property="fee" column="fee"/>
+        <result property="startDate" column="start_date"/>
+        <result property="duration" column="duration"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="memberNum" column="member_num"/>
+        <result property="desc" column="desc"/>
+        <result property="activityStatus" column="activity_status"/>
+        <result property="categoryId" column="category_id"/>
+        <result property="startType" column="start_type"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createUserId" column="create_user_id"/>
+    </resultMap>
+
+
+</mapper>
