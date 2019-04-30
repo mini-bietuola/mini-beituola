@@ -1,12 +1,15 @@
 package com.netease.mini.bietuola.web.util;
 
+import java.io.Serializable;
+
 /**
  * @Description
  * @Auther ctl
  * @Date 2019/4/28
  */
-public class JsonResponse {
+public class JsonResponse implements Serializable {
 
+    private static final long serialVersionUID = -7642609102961823970L;
     private int code;
     private String msg;
     private Object data;
