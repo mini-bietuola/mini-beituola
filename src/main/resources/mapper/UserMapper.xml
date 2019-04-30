@@ -3,6 +3,7 @@
 
 <mapper namespace="com.netease.mini.bietuola.mapper.UserMapper">
 
+
     <resultMap type="com.netease.mini.bietuola.entity.User" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="nickname" column="nickname"/>
@@ -20,4 +21,26 @@
     </resultMap>
 
 
+    <sql id="cols">
+        nickname,password_md5,phone,avatar_url,gender,age,`desc`,amount,score,create_time,update_time,status
+    </sql>
+
+    <select id="findUserByUserId" resultMap="BaseResultMap">
+      SELECT * from user WHERE id = #{id}
+    </select>
+
+    <insert id="save" parameterType="User">
+      INSERT INTO
+        user (<include refid="cols"/>)
+      VALUES (
+        #{nickname},#{passwordMd5},#{phone},#{avatarUrl},#{gender},#{age},#{desc},#{amount},#{score},#{createTime},#{updateTime},#{status}
+        )
+    </insert>
+    
+    <update id="updateByUserId" parameterType="User">
+      UPDATE user set nickname=#{nickname},password_md5=#{passwordMd5},phone=#{phone},
+      avatar_url=#{avatarUrl},gender=#{gender},age=#{age},`desc`=#{desc},amount=#{amount},
+      score=#{score},create_time=#{createTime},update_time=#{updateTime},status=#{status}
+      WHERE id=#{id}
+    </update>
 </mapper>
