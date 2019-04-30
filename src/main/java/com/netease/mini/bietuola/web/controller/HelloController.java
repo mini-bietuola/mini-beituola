@@ -10,6 +10,8 @@ import com.netease.mini.bietuola.web.controller.query.HelloQuery;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 import com.netease.mini.bietuola.web.util.ResultCode;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/hello")
 public class HelloController {
+
+    private final static Logger LOG = LoggerFactory.getLogger(Hello.class);
 
     private final HelloService helloService;
     private final RedisService redisService;
@@ -62,6 +66,7 @@ public class HelloController {
         h.setPrice(34.4444);
         h.setRole(Role.USER);
         if (helloService.save(h)) {
+            LOG.info("创建hello");
             return JsonResponse.success();
         }
         return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("保存失败");
@@ -79,11 +84,11 @@ public class HelloController {
     public void redisOps() {
         Hello hello = new Hello();
         hello.setName("hellll");
-        redisService.set("hello1", hello);
-        redisService.getStringRedisTemplate().opsForValue().set("stringKey", "stringValue");
+        redisService.set("hello1", hello); // 1
+        redisService.getStringRedisTemplate().opsForValue().set("stringKey", "stringValue"); // 2
 
-        System.out.println(redisService.get("hello1"));
-        System.out.println(redisService.getStringRedisTemplate().opsForValue().get("stringKey"));
+        System.out.println((Hello) redisService.get("hello1")); // 1
+        System.out.println(redisService.getStringRedisTemplate().opsForValue().get("stringKey"));  //2
 
     }
 
