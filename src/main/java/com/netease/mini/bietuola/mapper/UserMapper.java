@@ -1,6 +1,7 @@
 package com.netease.mini.bietuola.mapper;
 
 import com.netease.mini.bietuola.entity.User;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @Description
@@ -20,10 +21,25 @@ public interface UserMapper {
     /**
      * @param user 用户
      */
-    void save(User user);
+    int save(User user);
 
     /**
      * @param user 用户
      */
     void updateByUserId(User user);
+
+    /**
+     *
+     * @param phone
+     * @return
+     */
+    User getByPhone(@Param("phone") String phone);
+
+    int countByPhone(@Param("phone") String phone);
+
+    int updatePassword(@Param("phone") String phone, @Param("passwordMd5") String passwordMd5);
+
+    User getBaseInfoById(@Param("id") Long id);
+
+    int updateBaseInfoById(User user);
 }

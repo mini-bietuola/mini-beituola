@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.netease.mini.bietuola.config.convert.CustomStringToEnumConverterFactory;
 import com.netease.mini.bietuola.config.convert.IntEnumSerializer;
 import com.netease.mini.bietuola.config.mybatis.IntEnum;
+import com.netease.mini.bietuola.config.session.SessionService;
+import com.netease.mini.bietuola.web.interceptor.AuthInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
@@ -18,6 +21,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
  */
 @Configuration
 public class WebMvcConfig extends WebMvcConfigurerAdapter {
+
+    private final SessionService sessionService;
+
+    public WebMvcConfig(SessionService sessionService) {
+        this.sessionService = sessionService;
+    }
 
     /**
      * 处理请求传参枚举类反序列化
@@ -39,6 +48,14 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
         mapper.registerModule(sm);
         converter.setObjectMapper(mapper);
         return converter;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new AuthInterceptor(sessionService)).excludePathPatterns(
+                "/api/user/login", "/api/user/logout", "/api/user/register",
+                "/api/user/authcode", "/api/user/reset-password", "/api/user/check-phone-registered",
+                "/error");
     }
 
 }
