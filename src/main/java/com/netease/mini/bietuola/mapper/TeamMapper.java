@@ -1,21 +1,10 @@
 package com.netease.mini.bietuola.mapper;
 
 import com.netease.mini.bietuola.constant.TeamStatus;
-import com.netease.mini.bietuola.entity.RecomTeamInfo;
 import com.netease.mini.bietuola.entity.Team;
-import com.netease.mini.bietuola.entity.UserTeam;
-import org.springframework.data.repository.query.Param;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import com.netease.mini.bietuola.constant.TeamStatus;
-import com.netease.mini.bietuola.entity.Team;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-
-
-import com.netease.mini.bietuola.entity.Team;
 
 /**
  * @Description
