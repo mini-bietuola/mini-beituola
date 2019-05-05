@@ -27,9 +27,44 @@
         select * from team
         where activity_status=#{categoryId}
     </select>
+    <select id="listTeam" resultMap="BaseResultMap">
+        SELECT *
+        FROM team
+        WHERE activity_status = 1
+    </select>
+
+    <select id="getTeamByCategory" parameterType="Long" resultMap="BaseResultMap">
+       SELECT *
+       FROM team
+       WHERE activity_status = 1
+       AND category_id = #{categoryId}
+    </select>
+
+    <select id="getTeamById" parameterType="long" resultMap="BaseResultMap">
+       SELECT *
+       FROM team
+       WHERE id = #{teamId}
+    </select>
+
+    <select id="countMember" parameterType="long" resultType="int">
+        SELECT COUNT(id)
+        FROM user_team
+        WHERE id = #{teamId}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE team
+        SET start_date = #{startDate}, activity_status = #{teamStatus}
+        WHERE id = #{teamId}
+    </update>
+
+    <insert id="insertUserTeam" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_team(user_id, team_id, create_time, award_amount)
+        VALUES (#{userId}, #{teamId}, #{createTime}, #{awardAmount})
+    </insert>
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-     INSERT INTO team(name, avatar_url,img_url,fee,start_date,duration,member_num,category_id,`desc`,start_type,start_time,end_time,activity_status,create_time,update_time,create_user_id)
+        INSERT INTO team(name, avatar_url,img_url,fee,start_date,duration,member_num,category_id,`desc`,start_type,start_time,end_time,activity_status,create_time,update_time,create_user_id)
         VALUES (#{name},#{avatarUrl},#{imgUrl},#{fee},#{startDate},#{duration},#{memberNum},#{categoryId},#{desc},#{startType},#{startTime},#{endTime},#{activityStatus},#{createTime},#{updateTime},#{createUserId})
     </insert>
 </mapper>

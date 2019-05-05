@@ -20,4 +20,9 @@
         SELECT count(*) from user_team WHERE team_id=#{teamId}
     </select>
 
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_team(user_id, team_id, create_time, award_amount)
+        VALUES (#{userId}, #{teamId}, #{createTime}, #{awardAmount})
+    </insert>
+
 </mapper>

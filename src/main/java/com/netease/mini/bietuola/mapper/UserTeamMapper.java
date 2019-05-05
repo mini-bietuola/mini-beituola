@@ -22,4 +22,11 @@ public interface UserTeamMapper {
      * @return
      */
     long findTeamJoinNum(Long teamId);
+
+    /**
+     * 插入加入记录
+     * @param userTeam
+     * @return
+     */
+    int  insert(UserTeam userTeam);
 }

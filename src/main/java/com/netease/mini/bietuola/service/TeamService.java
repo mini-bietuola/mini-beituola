@@ -1,13 +1,10 @@
 package com.netease.mini.bietuola.service;
 
+import com.netease.mini.bietuola.entity.RecomTeamInfo;
 import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
-import com.netease.mini.bietuola.web.controller.query.TeamQuery;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-
-import com.netease.mini.bietuola.entity.Team;
 
 /**
  * @Description
@@ -37,4 +34,20 @@ public interface TeamService {
      */
     List<TeamDetailVo> findFinishedTeamDetail(Long userId);
     boolean save(Team team);
+    /**
+     * 查询推荐小组
+     *
+     * @param categoryId 类别ID
+     * @return
+     */
+    List<RecomTeamInfo> getRecomTeam(Long categoryId);
+
+    /**
+     * 加入小组
+     *
+     * @param teamId 小组ID
+     * @return
+     */
+    boolean participateTeam(long teamId);
+
 }

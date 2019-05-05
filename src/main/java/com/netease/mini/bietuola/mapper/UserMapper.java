@@ -1,5 +1,7 @@
 package com.netease.mini.bietuola.mapper;
 
+import java.math.BigDecimal;
+
 import com.netease.mini.bietuola.entity.User;
 import org.apache.ibatis.annotations.Param;
 
@@ -42,4 +44,8 @@ public interface UserMapper {
     User getBaseInfoById(@Param("id") Long id);
 
     int updateBaseInfoById(User user);
+
+    BigDecimal getAmount(long userId);
+
+    int updateAmount(@Param("amount") BigDecimal amount, @Param("userId") long userId);
 }
