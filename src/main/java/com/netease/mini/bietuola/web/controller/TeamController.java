@@ -34,13 +34,9 @@ import java.util.List;
 public class TeamController {
     private static final Logger LOG = LoggerFactory.getLogger(TeamController.class);
     private final TeamService teamService;
-
-    @Autowired
-    private SessionService sessionService;
-
-    public TeamController(TeamService teamService) {
     private final CategoryService categoryService;
     private final SessionService sessionService;
+
     public TeamController(TeamService teamService, CategoryService categoryService, SessionService sessionService) {
         this.teamService = teamService;
         this.categoryService =categoryService;

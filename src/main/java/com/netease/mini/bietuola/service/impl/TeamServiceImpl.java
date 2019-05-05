@@ -1,6 +1,5 @@
 package com.netease.mini.bietuola.service.impl;
 
-import com.github.pagehelper.PageHelper;
 import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.CheckRecord;
 import com.netease.mini.bietuola.entity.Team;
@@ -8,13 +7,8 @@ import com.netease.mini.bietuola.entity.UserTeam;
 import com.netease.mini.bietuola.mapper.CheckRecordMapper;
 import com.netease.mini.bietuola.mapper.TeamMapper;
 import com.netease.mini.bietuola.mapper.UserTeamMapper;
-import com.netease.mini.bietuola.entity.Team;
-import com.netease.mini.bietuola.mapper.HelloMapper;
-import com.netease.mini.bietuola.mapper.TeamMapper;
 import com.netease.mini.bietuola.service.TeamService;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
-import com.netease.mini.bietuola.web.controller.query.TeamQuery;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,22 +21,19 @@ import java.util.*;
 @Service("teamService")
 public class TeamServiceImpl implements TeamService {
     private final TeamMapper teamMapper;
+    private final UserTeamMapper userTeamMapper;
+    private final CheckRecordMapper checkRecordMapper;
 
-    public TeamServiceImpl(TeamMapper teamMapper) {
+    public TeamServiceImpl(TeamMapper teamMapper, UserTeamMapper userTeamMapper, CheckRecordMapper checkRecordMapper) {
         this.teamMapper =teamMapper;
+        this.userTeamMapper = userTeamMapper;
+        this.checkRecordMapper = checkRecordMapper;
     }
 
     @Override
     public boolean save(Team team) {
         return teamMapper.save(team)==1;
     }
-
-    @Autowired
-    private TeamMapper teamMapper;
-    @Autowired
-    private UserTeamMapper userTeamMapper;
-    @Autowired
-    private CheckRecordMapper checkRecordMapper;
 
     @Override
     public List<TeamDetailVo> findRecuitTeamDetail(Long userId) {
