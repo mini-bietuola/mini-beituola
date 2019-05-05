@@ -20,6 +20,10 @@
         <result property="status" column="status"/>
     </resultMap>
 
+    <select id="getByPhone" resultMap="BaseResultMap">
+        select * from user where phone = #{phone} limit 1
+    </select>
+
 
     <sql id="cols">
         nickname,password_md5,phone,avatar_url,gender,age,`desc`,amount,score,create_time,update_time,status
@@ -29,7 +33,18 @@
       SELECT * from user WHERE id = #{id}
     </select>
 
-    <insert id="save" parameterType="User">
+    <select id="countByPhone" resultType="_int">
+        SELECT COUNT(*) FROM user WHERE phone = #{phone}
+    </select>
+
+    <select id="getBaseInfoById" resultMap="BaseResultMap">
+        SELECT
+          id, nickname, phone, avatar_url, gender, age, `desc`, amount, score
+        FROM user
+        WHERE id = #{id} AND status = 0
+    </select>
+
+    <insert id="save" parameterType="User" useGeneratedKeys="true" keyProperty="id">
       INSERT INTO
         user (<include refid="cols"/>)
       VALUES (
@@ -42,5 +57,24 @@
       avatar_url=#{avatarUrl},gender=#{gender},age=#{age},`desc`=#{desc},amount=#{amount},
       score=#{score},create_time=#{createTime},update_time=#{updateTime},status=#{status}
       WHERE id=#{id}
+    </update>
+
+    <update id="updatePassword">
+      UPDATE user
+      SET password_md5 = #{passwordMd5}
+      WHERE phone = #{phone}
+    </update>
+
+    <update id="updateBaseInfoById" parameterType="com.netease.mini.bietuola.entity.User">
+        UPDATE user
+        SET
+          nickname = #{nickname},
+          avatar_url = #{avatarUrl},
+          gender = #{gender},
+          age = #{age},
+          `desc` = #{desc},
+          update_time = #{updateTime}
+        WHERE
+          id = #{id} AND status = 0
     </update>
 </mapper>

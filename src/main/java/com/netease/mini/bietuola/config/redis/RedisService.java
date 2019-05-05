@@ -1,9 +1,14 @@
 package com.netease.mini.bietuola.config.redis;
 
+import com.netease.mini.bietuola.config.redis.component.RedisLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -14,8 +19,12 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class RedisService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RedisService.class);
+
     private final RedisTemplate<String, Object> redisTemplate;
     private final StringRedisTemplate stringRedisTemplate;
+
+
 
     public RedisService(RedisTemplate<String, Object> redisTemplate, StringRedisTemplate stringRedisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -57,6 +66,8 @@ public class RedisService {
         return redisTemplate.expire(key, expireSecond, TimeUnit.SECONDS);
     }
 
-
+    public RedisLock getLock(String lockKey) {
+        return RedisLock.createLock(stringRedisTemplate, lockKey);
+    }
 
 }
