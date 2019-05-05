@@ -8,6 +8,9 @@ import com.netease.mini.bietuola.entity.UserTeam;
 import com.netease.mini.bietuola.mapper.CheckRecordMapper;
 import com.netease.mini.bietuola.mapper.TeamMapper;
 import com.netease.mini.bietuola.mapper.UserTeamMapper;
+import com.netease.mini.bietuola.entity.Team;
+import com.netease.mini.bietuola.mapper.HelloMapper;
+import com.netease.mini.bietuola.mapper.TeamMapper;
 import com.netease.mini.bietuola.service.TeamService;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
 import com.netease.mini.bietuola.web.controller.query.TeamQuery;
@@ -23,6 +26,16 @@ import java.util.*;
  */
 @Service("teamService")
 public class TeamServiceImpl implements TeamService {
+    private final TeamMapper teamMapper;
+
+    public TeamServiceImpl(TeamMapper teamMapper) {
+        this.teamMapper =teamMapper;
+    }
+
+    @Override
+    public boolean save(Team team) {
+        return teamMapper.save(team)==1;
+    }
 
     @Autowired
     private TeamMapper teamMapper;

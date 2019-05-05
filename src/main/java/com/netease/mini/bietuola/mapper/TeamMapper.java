@@ -5,6 +5,9 @@ import com.netease.mini.bietuola.entity.Team;
 
 import java.util.List;
 
+
+import com.netease.mini.bietuola.entity.Team;
+
 /**
  * @Description
  * @Auther ctl
@@ -17,4 +20,5 @@ public interface TeamMapper {
      * @return
      */
     List<Team> findTeamByActivityStatus(TeamStatus teamStatus);
+    int save(Team team);
 }

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import com.netease.mini.bietuola.entity.Team;
+
 /**
  * @Description
  * @Auther ctl
@@ -34,4 +36,5 @@ public interface TeamService {
      * @return
      */
     List<TeamDetailVo> findFinishedTeamDetail(Long userId);
+    boolean save(Team team);
 }
