@@ -19,5 +19,24 @@
         <result property="status" column="status"/>
     </resultMap>
 
+    <sql id="Base_Column_List">
+        id, nickname, password_md5, phone, avatar_url, gender, age, desc, amount, score, create_time, update_time, status
+    </sql>
+
+    <sql id="Alias_Column_List">
+        u.id, u.nickname, u.password_md5, u.phone, u.avatar_url, u.gender, u.age, u.desc, u.amount, u.score, u.create_time, u.update_time, u.status
+    </sql>
+
+
+    <select id="getAllUserByTeamId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select <include refid="Alias_Column_List"/>
+        from user as u
+        where id in
+        (
+        select user_id
+        from user_team
+        where team_id=#{teamId}
+        )
+    </select>
 
 </mapper>

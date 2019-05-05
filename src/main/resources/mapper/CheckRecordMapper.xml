@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.netease.mini.bietuola.mapper.CheckRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.netease.mini.bietuola.entity.CheckRecord">
+        <result column="id" property="id" />
+        <result column="userTeamId" property="user_team_id" />
+        <result column="checkTime" property="check_time" />
+    </resultMap>
+
+
+    <select id="CountCheckTimeByUserId" parameterType="map" resultType="java.lang.Integer">
+        select count(1)
+        from check_record
+        where user_team_id=
+        (
+        select id
+        from user_team
+        where user_id=#{userId}
+        and team_id=#{teamId}
+        )
+    </select>
+
+</mapper>
