@@ -1,6 +1,8 @@
 package com.netease.mini.bietuola.web.controller;
 
 import com.netease.mini.bietuola.service.TeamService;
+import com.netease.mini.bietuola.web.controller.query.TeamQuery;
+import com.netease.mini.bietuola.web.util.JsonResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,4 +23,24 @@ public class TeamController {
         this.teamService = teamService;
     }
 
+    @RequestMapping("/findRecuitTeamDetail")
+    public JsonResponse findRecuitTeamDetail(TeamQuery teamQuery){
+        JsonResponse jsonResponse = JsonResponse.success();
+        jsonResponse.setData(teamService.findRecuitTeamDetail(teamQuery));
+        return jsonResponse;
+    }
+
+    @RequestMapping("/findProccessingTeamDetail")
+    public JsonResponse findProccessingTeamDetail(TeamQuery teamQuery){
+        JsonResponse jsonResponse = JsonResponse.success();
+        jsonResponse.setData(teamService.findProccessingTeamDetail(teamQuery));
+        return jsonResponse;
+    }
+
+    @RequestMapping("/findFinishedTeamDetail")
+    public JsonResponse findFinishedTeamDetail(TeamQuery teamQuery){
+        JsonResponse jsonResponse = JsonResponse.success();
+        jsonResponse.setData(teamService.findFinishedTeamDetail(teamQuery));
+        return jsonResponse;
+    }
 }

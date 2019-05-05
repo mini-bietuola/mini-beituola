@@ -23,5 +23,9 @@
         <result property="createUserId" column="create_user_id"/>
     </resultMap>
 
+    <select id="findTeamByActivityStatus" resultMap="BaseResultMap">
+        select * from team
+        where activity_status=#{categoryId}
+    </select>
 
 </mapper>
