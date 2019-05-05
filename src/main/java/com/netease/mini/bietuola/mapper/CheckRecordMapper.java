@@ -1,6 +1,7 @@
 package com.netease.mini.bietuola.mapper;
 
 import com.netease.mini.bietuola.entity.CheckRecord;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -14,4 +15,20 @@ public interface CheckRecordMapper {
      * @return
      */
     List<CheckRecord> findCheckRecordByUserTeamId(Long userTeamId);
+
+    /**
+     * 保存打开信息
+     * @param userTeamId
+     * @param checkTime
+     */
+    void save(@Param("userTeamId") Long userTeamId,@Param("checkTime") Long checkTime);
+
+    /**
+     * 指定日期段打卡记录
+     * @param userTeamId
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    List<CheckRecord> CheckStatus(@Param("userTeamId") Long userTeamId,@Param("startTime") Long startTime,@Param("endTime") Long endTime);
 }

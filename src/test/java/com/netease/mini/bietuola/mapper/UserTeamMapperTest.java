@@ -36,4 +36,13 @@ public class UserTeamMapperTest {
         long num= userTeamMapper.findTeamJoinNum(teamId);
         Assert.assertNotNull(num);
     }
+
+    @Test
+    public void findUserTeamByUserIdAndTeamIdTest(){
+        Long teamId = 1l;
+        Long userId = 1l;
+        UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId,teamId
+        );
+        Assert.assertNotNull(userTeam);
+    }
 }

@@ -107,4 +107,22 @@ public class TeamController {
         jsonResponse.setData(teamService.findFinishedTeamDetail(userid));
         return jsonResponse;
     }
+
+    @RequestMapping("/checkRecord")
+    public JsonResponse checkRecord(Long teamId){
+        Long userid = sessionService.getCurrentUserId();
+        if(teamService.checkRecord(userid,teamId)){
+            return JsonResponse.success().setMsg("打卡成功");
+        }
+        return JsonResponse.codeOf(ResultCode.ERROR_CHECK_RECORD_FAIL).setMsg("打卡失败");
+    }
+
+    @RequestMapping("/queryTodayCheckStatus")
+    public JsonResponse queryTodayCheckStatus(Long teamId){
+        Long userid = sessionService.getCurrentUserId();
+        if(teamService.queryTodayCheckStatus(userid,teamId)){
+            return JsonResponse.success().setMsg("今日已打卡").setData(true);
+        }
+        return JsonResponse.success().setMsg("今日未打卡").setData(false);
+    }
 }

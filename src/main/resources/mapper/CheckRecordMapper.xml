@@ -14,4 +14,11 @@
       SELECT * from check_record WHERE user_team_id = #{userTeamId}
     </select>
 
+    <insert id="save">
+      INSERT INTO check_record(user_team_id,check_time) VALUES (#{userTeamId},#{checkTime})
+    </insert>
+
+    <select id="CheckStatus" resultMap="BaseResultMap">
+        SELECT * from check_record WHERE user_team_id = #{userTeamId} and check_time>=#{startTime} and check_time<![CDATA[ <= ]]>#{endTime}
+    </select>
 </mapper>

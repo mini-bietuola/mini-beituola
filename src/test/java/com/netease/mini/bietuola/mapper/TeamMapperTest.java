@@ -28,4 +28,11 @@ public class TeamMapperTest {
         List<Team> teamList= teamMapper.findTeamByActivityStatus(TeamStatus.RECUIT_FAILED);
         Assert.assertNotNull(teamList);
     }
+
+    @Test
+    public void findTeamByTeamIdTest(){
+        Long teamId = 1l;
+        Team team = teamMapper.findTeamByTeamId(teamId);
+        Assert.assertNotNull(team);
+    }
 }

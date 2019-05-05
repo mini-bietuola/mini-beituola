@@ -1,7 +1,10 @@
 package com.netease.mini.bietuola.service;
 
+import com.netease.mini.bietuola.entity.CheckRecord;
+import com.netease.mini.bietuola.mapper.CheckRecordMapper;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
 import com.netease.mini.bietuola.web.controller.query.TeamQuery;
+import com.netease.mini.bietuola.web.util.DateUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +25,8 @@ public class TeamServiceTest {
 
     @Autowired
     private TeamService teamService;
+    @Autowired
+    private CheckRecordMapper checkRecordMapper;
 
     @Test
     public void findRecuitTeamDetailTest(){
@@ -45,5 +50,15 @@ public class TeamServiceTest {
         teamQuery.setUserId(1l);
         List<TeamDetailVo> teamDetailVoList=teamService.findFinishedTeamDetail(1l);
         Assert.assertNotNull(teamDetailVoList);
+    }
+
+    @Test
+    public void checkRecord(){
+        Long teamId = 1l;
+        Long userId = 1l;
+        Long userTeamId = 1l;
+        boolean b=teamService.checkRecord(userId,teamId);
+        List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeamId, DateUtil.getTodayStart(),DateUtil.getTodayEnd());
+        Assert.assertEquals(false,b);
     }
 }

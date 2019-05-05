@@ -36,5 +36,27 @@ public interface TeamService {
      * @return
      */
     List<TeamDetailVo> findFinishedTeamDetail(Long userId);
+
+    /**
+     * 创建小组
+     * @param team
+     * @return
+     */
     boolean save(Team team);
+
+    /**
+     * 打卡操作
+     * @param userId
+     * @param teamId
+     * @return
+     */
+    boolean checkRecord(Long userId, Long teamId);
+
+    /**
+     * 查询今日打卡情况
+     * @param userId
+     * @param teamId
+     * @return
+     */
+    boolean queryTodayCheckStatus(Long userId, Long teamId);
 }

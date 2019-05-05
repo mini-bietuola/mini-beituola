@@ -22,4 +22,12 @@ public interface UserTeamMapper {
      * @return
      */
     long findTeamJoinNum(Long teamId);
+
+    /**
+     * 查询用户参与的小组的信息
+     * @param userId
+     * @param teamId
+     * @return
+     */
+    UserTeam findUserTeamByUserIdAndTeamId(@Param("userId") Long userId, @Param("teamId") Long teamId);
 }

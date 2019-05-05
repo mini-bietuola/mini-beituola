@@ -20,4 +20,7 @@
         SELECT count(*) from user_team WHERE team_id=#{teamId}
     </select>
 
+    <select id="findUserTeamByUserIdAndTeamId" resultMap="BaseResultMap">
+        SELECT * FROM user_team WHERE user_id= #{userId} and team_id = #{teamId}
+    </select>
 </mapper>

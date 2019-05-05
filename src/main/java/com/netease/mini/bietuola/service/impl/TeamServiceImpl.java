@@ -9,6 +9,7 @@ import com.netease.mini.bietuola.mapper.TeamMapper;
 import com.netease.mini.bietuola.mapper.UserTeamMapper;
 import com.netease.mini.bietuola.service.TeamService;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
+import com.netease.mini.bietuola.web.util.DateUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -101,6 +102,34 @@ public class TeamServiceImpl implements TeamService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean checkRecord(Long userId, Long teamId) {
+        Team team = teamMapper.findTeamByTeamId(teamId);
+        UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId,teamId);
+        Integer startTime = team.getStartTime();
+        Integer endTime = team.getEndTime();
+        long current = System.currentTimeMillis();
+        long zero = current/(1000*24*3600)*(1000*24*3600)- TimeZone.getDefault().getRawOffset();
+        if(current>=zero+startTime*60*1000&&current<=zero+endTime*60*1000){
+            List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(),DateUtil.getTodayStart(),DateUtil.getTodayEnd());
+            if(checkRecordList.size()==0){
+                checkRecordMapper.save(teamId,current);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean queryTodayCheckStatus(Long userId, Long teamId) {
+        UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId,teamId);
+        List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(),DateUtil.getTodayStart(),DateUtil.getTodayEnd());
+        if(checkRecordList.size()==0){
+            return false;
+        }
+        return true;
     }
 
     public static void main(String[] args) {
