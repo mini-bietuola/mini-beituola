@@ -28,5 +28,7 @@ public interface ResultCode {
     int ERROR_BAD_PARAMETER = -6;
 
     /** 待续 **/
+    /** 验证码校验失败 */
+    int VERIFY_CODE_FAIL = -1001;
 
 }
