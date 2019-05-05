@@ -1,19 +1,14 @@
 package com.netease.mini.bietuola.web.controller;
 
-import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
-import com.netease.mini.bietuola.constant.Role;
+import com.netease.mini.bietuola.config.session.SessionService;
 import com.netease.mini.bietuola.constant.StartType;
 import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.Category;
-import com.netease.mini.bietuola.entity.Hello;
 import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.service.CategoryService;
 import com.netease.mini.bietuola.service.TeamService;
-import com.netease.mini.bietuola.web.controller.query.HelloQuery;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 import com.netease.mini.bietuola.web.util.ResultCode;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,13 +30,15 @@ public class TeamController {
     private static final Logger LOG = LoggerFactory.getLogger(TeamController.class);
     private final TeamService teamService;
     private final CategoryService categoryService;
-    public TeamController(TeamService teamService,CategoryService categoryService) {
+    private final SessionService sessionService;
+    public TeamController(TeamService teamService, CategoryService categoryService, SessionService sessionService) {
         this.teamService = teamService;
         this.categoryService =categoryService;
+        this.sessionService = sessionService;
     }
 
     @PostMapping
-    public JsonResponse create(String name,String avatarUrl,String imgUrl,BigDecimal fee,Long startDate,Integer duration,Integer startTime, Integer endTime,Integer memberNum,String desc,TeamStatus activityStatus,Long categoryId, StartType startType,Long createTime,Long updateTime,Long createUserId) {
+    public JsonResponse create(String name,String avatarUrl,String imgUrl,BigDecimal fee,Long startDate,Integer duration,Integer startTime, Integer endTime,Integer memberNum,String desc,TeamStatus activityStatus,Long categoryId, StartType startType,Long createTime,Long updateTime) {
         Team h=new Team();
         h.setName(name);
         h.setAvatarUrl(avatarUrl);
@@ -64,7 +61,7 @@ public class TeamController {
         h.setEndTime(endTime);
         h.setCreateTime(createTime);
         h.setUpdateTime(updateTime);
-        h.setCreateUserId(createUserId);
+        h.setCreateUserId(sessionService.getCurrentUserId());
         if (teamService.save(h)) {
             LOG.info("创建小组");
             return JsonResponse.success();
