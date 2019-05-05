@@ -2,12 +2,12 @@ package com.netease.mini.bietuola.mapper;
 
 import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.Team;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 
 import com.netease.mini.bietuola.entity.Team;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * @Description
@@ -36,4 +36,14 @@ public interface TeamMapper {
      * @return
      */
     int save(Team team);
+
+    List<Team> listTeam();
+
+    List<Team> getTeamByCategory(Long categoryId);
+
+    Team getTeamById(long teamId);
+
+    int countMember(long teamId);
+
+    int updateStatus(@Param("startDate") long startDate, @Param("teamStatus") TeamStatus teamStatus, @Param("teamId") long teamId);
 }

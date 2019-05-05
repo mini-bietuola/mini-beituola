@@ -30,4 +30,11 @@ public interface UserTeamMapper {
      * @return
      */
     UserTeam findUserTeamByUserIdAndTeamId(@Param("userId") Long userId, @Param("teamId") Long teamId);
+
+    /**
+     * 插入加入记录
+     * @param userTeam
+     * @return
+     */
+    int  insert(UserTeam userTeam);
 }

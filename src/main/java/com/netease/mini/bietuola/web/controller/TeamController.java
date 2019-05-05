@@ -1,27 +1,27 @@
 package com.netease.mini.bietuola.web.controller;
 
-import com.netease.mini.bietuola.config.session.SessionService;
-import com.netease.mini.bietuola.entity.User;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.netease.mini.bietuola.config.session.SessionService;
 import com.netease.mini.bietuola.constant.StartType;
 import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.Category;
+import com.netease.mini.bietuola.entity.RecomTeamInfo;
 import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.service.CategoryService;
 import com.netease.mini.bietuola.service.TeamService;
-import com.netease.mini.bietuola.web.controller.query.TeamQuery;
-import com.netease.mini.bietuola.web.util.JsonResponse;
+import com.netease.mini.bietuola.web.controller.query.common.PageQuery;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 import com.netease.mini.bietuola.web.util.ResultCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -125,4 +125,36 @@ public class TeamController {
         }
         return JsonResponse.success().setMsg("今日未打卡").setData(false);
     }
+    /**
+     * 获取推荐小组列表
+     *
+     * @param categoryId 类别ID
+     * @return
+     */
+    @GetMapping("/recommend")
+    public JsonResponse getRecomTeam(Long categoryId, PageQuery pageQuery) {
+        PageHelper.startPage(pageQuery.getPageNumber(), pageQuery.getPageSize());
+        List<RecomTeamInfo> teamInfos = new ArrayList<>();
+        teamInfos=teamService.getRecomTeam(categoryId);
+        PageInfo<RecomTeamInfo> result = new PageInfo<>(teamInfos);
+        return JsonResponse.success(result);
+    }
+
+    /**
+     * 加入小组
+     *
+     * @param teamId 小组ID
+     * @return
+     */
+    @PostMapping("/participate")
+    public JsonResponse participateTeam(long teamId){
+        if(teamId<=0){
+            return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数错误");
+        }
+        if(teamService.participateTeam(teamId)){
+            return JsonResponse.success();
+        }
+        return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("加入失败");
+    }
+
 }

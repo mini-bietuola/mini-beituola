@@ -36,13 +36,23 @@ public interface TeamService {
      * @return
      */
     List<TeamDetailVo> findFinishedTeamDetail(Long userId);
-
+    boolean save(Team team);
     /**
-     * 创建小组
-     * @param team
+     * 查询推荐小组
+     *
+     * @param categoryId 类别ID
      * @return
      */
-    boolean save(Team team);
+    List<RecomTeamInfo> getRecomTeam(Long categoryId);
+
+    /**
+     * 加入小组
+     *
+     * @param teamId 小组ID
+     * @return
+     */
+    boolean participateTeam(long teamId);
+
 
     /**
      * 打卡操作
