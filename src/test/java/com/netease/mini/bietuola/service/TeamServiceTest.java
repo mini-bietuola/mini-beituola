@@ -27,7 +27,7 @@ public class TeamServiceTest {
     public void findRecuitTeamDetailTest(){
         TeamQuery teamQuery =new TeamQuery();
         teamQuery.setUserId(1l);
-        List<TeamDetailVo> teamDetailVoList=teamService.findRecuitTeamDetail(teamQuery);
+        List<TeamDetailVo> teamDetailVoList=teamService.findRecuitTeamDetail(1l);
         Assert.assertNotNull(teamDetailVoList);
     }
 
@@ -35,7 +35,7 @@ public class TeamServiceTest {
     public void findProccessingTeamDetailTest(){
         TeamQuery teamQuery =new TeamQuery();
         teamQuery.setUserId(1l);
-        List<TeamDetailVo> teamDetailVoList=teamService.findProccessingTeamDetail(teamQuery);
+        List<TeamDetailVo> teamDetailVoList=teamService.findProccessingTeamDetail(1l);
         Assert.assertNotNull(teamDetailVoList);
     }
 
@@ -43,7 +43,7 @@ public class TeamServiceTest {
     public void findFinishedTeamDetailTest(){
         TeamQuery teamQuery =new TeamQuery();
         teamQuery.setUserId(1l);
-        List<TeamDetailVo> teamDetailVoList=teamService.findFinishedTeamDetail(teamQuery);
+        List<TeamDetailVo> teamDetailVoList=teamService.findFinishedTeamDetail(1l);
         Assert.assertNotNull(teamDetailVoList);
     }
 }

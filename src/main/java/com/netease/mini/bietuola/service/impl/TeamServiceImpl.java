@@ -32,10 +32,10 @@ public class TeamServiceImpl implements TeamService {
     private CheckRecordMapper checkRecordMapper;
 
     @Override
-    public List<TeamDetailVo> findRecuitTeamDetail(TeamQuery teamQuery) {
+    public List<TeamDetailVo> findRecuitTeamDetail(Long userId) {
         List<TeamDetailVo> teamDetailVoList = new ArrayList<>();
         List<Team> teamList=teamMapper.findTeamByActivityStatus(TeamStatus.RECUIT);
-        List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(teamQuery.getUserId());
+        List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(userId);
         for(UserTeam userTeam:userTeamList){
             for(Team team:teamList){
                 if(userTeam.getTeamId()==team.getId()){
@@ -50,10 +50,10 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<TeamDetailVo> findProccessingTeamDetail(TeamQuery teamQuery) {
+    public List<TeamDetailVo> findProccessingTeamDetail(Long userId) {
         List<TeamDetailVo> teamDetailVoList = new ArrayList<>();
         List<Team> teamList=teamMapper.findTeamByActivityStatus(TeamStatus.PROCCESSING);
-        List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(teamQuery.getUserId());
+        List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(userId);
         for(UserTeam userTeam:userTeamList){
             for(Team team:teamList){
                 if(userTeam.getTeamId()==team.getId()){
@@ -73,10 +73,10 @@ public class TeamServiceImpl implements TeamService {
         return teamDetailVoList;
     }
 
-    public List<TeamDetailVo> findFinishedTeamDetail(TeamQuery teamQuery){
+    public List<TeamDetailVo> findFinishedTeamDetail(Long userId){
         List<TeamDetailVo> teamDetailVoList = new ArrayList<>();
         List<Team> teamList=teamMapper.findTeamByActivityStatus(TeamStatus.FINISHED);
-        List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(teamQuery.getUserId());
+        List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(userId);
         for(UserTeam userTeam:userTeamList){
             for(Team team:teamList){
                 if(userTeam.getTeamId()==team.getId()){

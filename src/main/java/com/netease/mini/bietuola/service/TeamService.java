@@ -16,22 +16,22 @@ public interface TeamService {
 
     /**
      * 查询userId对应的招募小组详情列表
-     * @param teamQuery
+     * @param userId
      * @return
      */
-    List<TeamDetailVo> findRecuitTeamDetail(TeamQuery teamQuery);
+    List<TeamDetailVo> findRecuitTeamDetail(Long userId);
 
     /**
      * 查询userId对应的进行小组详情列表
-     * @param teamQuery
+     * @param userId
      * @return
      */
-    List<TeamDetailVo> findProccessingTeamDetail(TeamQuery teamQuery);
+    List<TeamDetailVo> findProccessingTeamDetail(Long userId);
 
     /**
      * 查询userId对应的已结束小组详情列表
-     * @param teamQuery
+     * @param userId
      * @return
      */
-    List<TeamDetailVo> findFinishedTeamDetail(TeamQuery teamQuery);
+    List<TeamDetailVo> findFinishedTeamDetail(Long userId);
 }
