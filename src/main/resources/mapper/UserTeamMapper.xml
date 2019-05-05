@@ -3,7 +3,8 @@
 
 <mapper namespace="com.netease.mini.bietuola.mapper.UserTeamMapper">
 
-    <resultMap type="com.netease.mini.bietuola.entity.User" id="BaseResultMap">
+
+    <resultMap type="com.netease.mini.bietuola.entity.UserTeam" id="BaseResultMap">
         <result property="id" column="id"/>
         <result property="userId" column="user_id"/>
         <result property="teamId" column="team_id"/>
@@ -12,14 +13,30 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-      id, user_id, team_id, create_time, award_amount
+        id, user_id, team_id, create_time, award_amount
     </sql>
 
     <select id="selectAwardAmountByUserIdTeamId" parameterType="map" resultType="java.math.BigDecimal">
-      select award_amount
-      from user_team
-      where team_id=#{teamId}
-      and user_id=#{userId}
+        select award_amount
+        from user_team
+        where team_id=#{teamId}
+        and user_id=#{userId}
     </select>
+
+    <select id="findUserTeamByUserId" resultMap="BaseResultMap">
+      SELECT * from user_team WHERE user_id= #{userId}
+    </select>
+
+    <select id="findTeamJoinNum" resultType="long">
+        SELECT count(*) from user_team WHERE team_id=#{teamId}
+    </select>
+
+    <select id="findUserTeamByUserIdAndTeamId" resultMap="BaseResultMap">
+        SELECT * FROM user_team WHERE user_id= #{userId} and team_id = #{teamId}
+    </select>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_team(user_id, team_id, create_time, award_amount)
+        VALUES (#{userId}, #{teamId}, #{createTime}, #{awardAmount})
+    </insert>
 
 </mapper>

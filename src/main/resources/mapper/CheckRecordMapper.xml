@@ -3,12 +3,24 @@
 
 <mapper namespace="com.netease.mini.bietuola.mapper.CheckRecordMapper">
 
-    <resultMap id="BaseResultMap" type="com.netease.mini.bietuola.entity.CheckRecord">
-        <result column="id" property="id" />
-        <result column="userTeamId" property="user_team_id" />
-        <result column="checkTime" property="check_time" />
+
+    <resultMap type="com.netease.mini.bietuola.entity.CheckRecord" id="BaseResultMap">
+        <result property="id" column="id"/>
+        <result property="userTeamId" column="user_team_id"/>
+        <result property="checkTime" column="check_time"/>
     </resultMap>
 
+    <select id="findCheckRecordByUserTeamId" resultMap="BaseResultMap">
+      SELECT * from check_record WHERE user_team_id = #{userTeamId}
+    </select>
+
+    <insert id="save">
+      INSERT INTO check_record(user_team_id,check_time) VALUES (#{userTeamId},#{checkTime})
+    </insert>
+
+    <select id="CheckStatus" resultMap="BaseResultMap">
+        SELECT * from check_record WHERE user_team_id = #{userTeamId} and check_time>=#{startTime} and check_time<![CDATA[ <= ]]>#{endTime}
+    </select>
 
     <select id="CountCheckTimeByUserId" parameterType="map" resultType="java.lang.Integer">
         select count(1)
@@ -21,5 +33,4 @@
         and team_id=#{teamId}
         )
     </select>
-
 </mapper>

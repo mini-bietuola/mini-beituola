@@ -20,4 +20,8 @@
         where id=#{id}
     </select>
 
+    <select id="listcategory" resultMap="BaseResultMap">
+        SELECT id, name, img_url, score FROM category
+    </select>
+
 </mapper>

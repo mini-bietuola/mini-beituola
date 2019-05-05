@@ -11,7 +11,7 @@ public class PageQuery implements Serializable {
     private static final long serialVersionUID = 6221080575231282954L;
 
     private int pageNumber = 1; // 页码，默认1
-    private int pageSize = 10; // 每页记录数，默认10
+    private int pageSize = 5; // 每页记录数，默认10
     private String sortName; // 排序字段名称
     private String sortOrder; // 排序顺序，asc/desc
     private String searchText; // 其它查询字符串

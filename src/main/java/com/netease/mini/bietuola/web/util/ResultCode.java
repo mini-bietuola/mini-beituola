@@ -27,6 +27,10 @@ public interface ResultCode {
     /** 参数格式错误 */
     int ERROR_BAD_PARAMETER = -6;
 
+    int ERROR_CHECK_RECORD_FAIL = -7;
+
     /** 待续 **/
+    /** 验证码校验失败 */
+    int VERIFY_CODE_FAIL = -1001;
 
 }

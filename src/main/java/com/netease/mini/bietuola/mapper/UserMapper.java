@@ -1,7 +1,11 @@
 package com.netease.mini.bietuola.mapper;
 
+import java.math.BigDecimal;
+
 import com.netease.mini.bietuola.entity.User;
-import org.springframework.stereotype.Component;
+import org.apache.ibatis.annotations.Param;
+
+import com.netease.mini.bietuola.entity.User;
 
 import java.util.List;
 
@@ -11,6 +15,43 @@ import java.util.List;
  * @Date 2019/4/30
  */
 public interface UserMapper {
+
+    /**
+     * 根据用户id查找用户
+     * @param userId 用户id
+     * @return
+     */
+    User findUserByUserId(int userId);
+
+
+    /**
+     * @param user 用户
+     */
+    int save(User user);
+
+    /**
+     * @param user 用户
+     */
+    void updateByUserId(User user);
+
+    /**
+     *
+     * @param phone
+     * @return
+     */
+    User getByPhone(@Param("phone") String phone);
+
+    int countByPhone(@Param("phone") String phone);
+
+    int updatePassword(@Param("phone") String phone, @Param("passwordMd5") String passwordMd5);
+
+    User getBaseInfoById(@Param("id") Long id);
+
+    int updateBaseInfoById(User user);
+
+    BigDecimal getAmount(long userId);
+
+    int updateAmount(@Param("amount") BigDecimal amount, @Param("userId") long userId);
 
     List<User> getAllUserByTeamId(Long teamId);
 
