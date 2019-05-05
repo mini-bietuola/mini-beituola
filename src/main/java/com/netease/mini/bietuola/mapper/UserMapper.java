@@ -10,7 +10,6 @@ import java.util.List;
  * @Auther ctl
  * @Date 2019/4/30
  */
-@Component
 public interface UserMapper {
 
     List<User> getAllUserByTeamId(Long teamId);

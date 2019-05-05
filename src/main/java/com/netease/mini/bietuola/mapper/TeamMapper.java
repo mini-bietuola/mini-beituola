@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
  * @Auther ctl
  * @Date 2019/4/30
  */
-@Component
 public interface TeamMapper {
 
     Team selectTeamInfoById(Long teamId);
