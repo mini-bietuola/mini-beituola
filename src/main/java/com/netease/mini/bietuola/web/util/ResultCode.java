@@ -33,4 +33,7 @@ public interface ResultCode {
     /** 验证码校验失败 */
     int VERIFY_CODE_FAIL = -1001;
 
+    /** 服务抛异常，全局处理状态 */
+    int ERROR_EXCEPTION_GLOBAL = -9001;
+
 }
