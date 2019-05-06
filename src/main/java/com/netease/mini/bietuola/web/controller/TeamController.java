@@ -149,10 +149,10 @@ public class TeamController {
      */
     @PostMapping("/participate")
     public JsonResponse participateTeam(long teamId){
-        if(teamId<=0){
+        if (teamId <= 0) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数错误");
         }
-        if(teamService.participateTeam(teamId)){
+        if (teamService.participateTeam(teamId)) {
             return JsonResponse.success();
         }
         return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("加入失败");
