@@ -2,6 +2,7 @@ package com.netease.mini.bietuola.web.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.netease.mini.bietuola.config.redis.RedisService;
 import com.netease.mini.bietuola.config.session.SessionService;
 import com.netease.mini.bietuola.constant.StartType;
 import com.netease.mini.bietuola.constant.TeamStatus;
@@ -148,13 +149,24 @@ public class TeamController {
      */
     @PostMapping("/participate")
     public JsonResponse participateTeam(long teamId){
-        if(teamId<=0){
+        if (teamId <= 0) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数错误");
         }
-        if(teamService.participateTeam(teamId)){
+        if (teamService.participateTeam(teamId)) {
             return JsonResponse.success();
         }
         return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("加入失败");
+    }
+
+    /**
+     * 获取小组详情
+     * @param teamId
+     * @return
+     */
+    @RequestMapping("/baseinfo")
+    public JsonResponse getBaseInfo(Long teamId){
+        Long userId = sessionService.getCurrentUserId();
+        return teamService.getBaseInfo(teamId, userId);
     }
 
 }

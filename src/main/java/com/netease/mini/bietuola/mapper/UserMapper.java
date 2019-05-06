@@ -5,6 +5,10 @@ import java.math.BigDecimal;
 import com.netease.mini.bietuola.entity.User;
 import org.apache.ibatis.annotations.Param;
 
+import com.netease.mini.bietuola.entity.User;
+
+import java.util.List;
+
 /**
  * @Description
  * @Auther ctl
@@ -48,4 +52,13 @@ public interface UserMapper {
     BigDecimal getAmount(long userId);
 
     int updateAmount(@Param("amount") BigDecimal amount, @Param("userId") long userId);
+
+
+    /**
+     * 查询小组所有用户个人信息
+     * @param teamId
+     * @return
+     */
+    List<User> getAllUserByTeamId(Long teamId);
+
 }

@@ -21,4 +21,16 @@
     <select id="CheckStatus" resultMap="BaseResultMap">
         SELECT * from check_record WHERE user_team_id = #{userTeamId} and check_time>=#{startTime} and check_time<![CDATA[ <= ]]>#{endTime}
     </select>
+
+    <select id="CountCheckTimeByUserId" parameterType="map" resultType="java.lang.Integer">
+        select count(1)
+        from check_record
+        where user_team_id=
+        (
+        select id
+        from user_team
+        where user_id=#{userId}
+        and team_id=#{teamId}
+        )
+    </select>
 </mapper>

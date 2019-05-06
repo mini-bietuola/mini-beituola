@@ -12,6 +12,17 @@
         <result property="awardAmount" column="award_amount"/>
     </resultMap>
 
+    <sql id="Base_Column_List">
+        id, user_id, team_id, create_time, award_amount
+    </sql>
+
+    <select id="selectAwardAmountByUserIdTeamId" parameterType="map" resultType="java.math.BigDecimal">
+        select award_amount
+        from user_team
+        where team_id=#{teamId}
+        and user_id=#{userId}
+    </select>
+
     <select id="findUserTeamByUserId" resultMap="BaseResultMap">
       SELECT * from user_team WHERE user_id= #{userId}
     </select>
