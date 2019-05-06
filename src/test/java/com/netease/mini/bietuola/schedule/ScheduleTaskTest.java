@@ -23,7 +23,7 @@ import java.util.Date;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-@Transactional
+//@Transactional
 public class ScheduleTaskTest {
     @Autowired
     private TeamMapper teamMapper;
@@ -44,7 +44,7 @@ public class ScheduleTaskTest {
     @Test
     public void teamStatusChangeTest() throws InterruptedException {
         TeamStatus teamStatus = teamMapper.getTeamById(1l).getActivityStatus();
-        scheduleTask.task();
+        scheduleTask.teamStatusChange();
         Thread.sleep(1000*10l);
         TeamStatus teamStatus1 =teamMapper.getTeamById(1l).getActivityStatus();
     }

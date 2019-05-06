@@ -32,7 +32,7 @@ public class ScheduleTask {
     @Autowired
     private UserMapper userMapper;
 
-    @Scheduled(cron = "0/5 * * * * ?")
+    @Scheduled(cron = "0/50 * * * * ?")
     public void task() {
         teamStatusChange();
         System.out.println("执行定时任务");
@@ -41,7 +41,7 @@ public class ScheduleTask {
     /**
      * 小组状态由进行变化为结束
      */
-    private void teamStatusChange() {
+    public void teamStatusChange() {
         List<Team> teamList = teamMapper.findTeamByActivityStatus(TeamStatus.PROCCESSING);
         for (Team team : teamList) {
             //打卡开始时间
@@ -64,7 +64,7 @@ public class ScheduleTask {
                     for (User user : userList) {
                         int times = checkRecordMapper.CountCheckTimeByUserId(user.getId(), team.getId());
                         user.setAmount(user.getAmount().add(team.getFee().divide(new BigDecimal(sum)).multiply(new BigDecimal(times))));
-                        userMapper.updateBaseInfoById(user);
+                        userMapper.updateByUserId(user);
                     }
                 }
             }
