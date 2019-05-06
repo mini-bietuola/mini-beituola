@@ -2,8 +2,11 @@ package com.netease.mini.bietuola.schedule;
 
 import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.Team;
+import com.netease.mini.bietuola.mapper.CheckRecordMapper;
 import com.netease.mini.bietuola.mapper.TeamMapper;
+import com.netease.mini.bietuola.mapper.UserMapper;
 import com.netease.mini.bietuola.service.TeamService;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -22,6 +25,10 @@ public class ScheduleTest {
 
     @Autowired
     private TeamMapper teamMapper;
+    @Autowired
+    private CheckRecordMapper checkRecordMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     @Scheduled(cron = "0/5 * * * * ?")
     private void task() {
