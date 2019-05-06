@@ -1,5 +1,6 @@
 package com.netease.mini.bietuola.service;
 
+import com.netease.mini.bietuola.entity.RecomTeamInfo;
 import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
 import com.netease.mini.bietuola.web.controller.query.TeamQuery;

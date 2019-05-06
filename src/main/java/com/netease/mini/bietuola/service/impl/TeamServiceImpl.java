@@ -14,6 +14,7 @@ import com.netease.mini.bietuola.service.TeamService;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
 import com.netease.mini.bietuola.web.util.DateUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
@@ -43,8 +44,17 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    @Transactional
     public boolean save(Team team) {
-        return teamMapper.save(team)==1;
+        long userId = team.getCreateUserId();
+        BigDecimal fee = team.getFee();
+        BigDecimal amount = userMapper.getAmount(userId);
+        if (amount.compareTo(fee) > 0) {
+            BigDecimal newAmount = amount.subtract(fee);
+            userMapper.updateAmount(newAmount, userId);
+            return teamMapper.save(team) == 1;
+        }
+        return false;
     }
 
     @Override
