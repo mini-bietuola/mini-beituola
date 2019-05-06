@@ -30,11 +30,11 @@ public class CaptchaService {
     //验证短信验证码的请求路径URL
     private static final String VERIFY_CODE_URL = "https://api.netease.im/sms/verifycode.action";
     //网易云信分配的账号
-    private static final String APP_KEY="6d4d6937fe268a996dc0615bad1db8da";
+    private static final String APP_KEY="f7afe252675ae77963e5beef2b0e7c24";
     //网易云信分配的密钥
-    private static final String APP_SECRET="8b3923f2b859";
+    private static final String APP_SECRET="452794b08c04";
     //短信模板ID
-    private static final String AUTH_VERIFY_CODE_TEMPLATEID="xxxxxxx";
+    private static final String AUTH_VERIFY_CODE_TEMPLATEID="4093383";
     //验证码长度，范围4～10，默认为4
     private static final String CODELEN="6";
 
