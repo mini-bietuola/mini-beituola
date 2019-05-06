@@ -47,7 +47,17 @@ public interface TeamMapper {
 
     int updateStatus(@Param("startDate") long startDate, @Param("teamStatus") TeamStatus teamStatus, @Param("teamId") long teamId);
 
+    /**
+     * 通过Id查询小组基本信息
+     * @param teamId
+     * @return
+     */
     Team selectTeamInfoById(Long teamId);
 
+    /**
+     * 计算小组当前人数
+     * @param teamId
+     * @return
+     */
     int countCurrentMemberNum(Long teamId);
 }

@@ -32,5 +32,12 @@ public interface CheckRecordMapper {
      */
     List<CheckRecord> CheckStatus(@Param("userTeamId") Long userTeamId,@Param("startTime") Long startTime,@Param("endTime") Long endTime);
 
+
+    /**
+     * 计算用户打卡次数
+     * @param userId
+     * @param teamId
+     * @return
+     */
     int CountCheckTimeByUserId(@Param("userId") Long userId, @Param("teamId") Long teamId);
 }

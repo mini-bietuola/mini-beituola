@@ -44,13 +44,15 @@ public class TeamServiceImpl implements TeamService {
     private final CheckRecordMapper checkRecordMapper;
     private final UserMapper userMapper;
     private final SessionService sessionService;
+    private final CategoryMapper categoryMapper;
 
-    public TeamServiceImpl(TeamMapper teamMapper, UserTeamMapper userTeamMapper, CheckRecordMapper checkRecordMapper, UserMapper userMapper, SessionService sessionService) {
+    public TeamServiceImpl(TeamMapper teamMapper, UserTeamMapper userTeamMapper, CheckRecordMapper checkRecordMapper, UserMapper userMapper, SessionService sessionService, CategoryMapper categoryMapper) {
         this.teamMapper =teamMapper;
         this.userTeamMapper = userTeamMapper;
         this.checkRecordMapper = checkRecordMapper;
         this.userMapper=userMapper;
         this.sessionService = sessionService;
+        this.categoryMapper = categoryMapper;
     }
 
     @Override

@@ -22,5 +22,11 @@ public interface CategoryMapper {
 //
 //    int update(@Param("name") String name, @Param("id") long id);
 
+
+    /**
+     * 查询该类别对应积分
+     * @param id
+     * @return
+     */
     int selectScoreById(Long id);
 }

@@ -3,6 +3,7 @@ package com.netease.mini.bietuola.mapper;
 import com.netease.mini.bietuola.entity.UserTeam;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -38,5 +39,11 @@ public interface UserTeamMapper {
      */
     int  insert(UserTeam userTeam);
 
+    /**
+     * 查询个人最后获得金钱
+     * @param userId，teamId
+     * @return
+     */
     BigDecimal selectAwardAmountByUserIdTeamId(@Param("userId") Long userId, @Param("teamId") Long teamId);
+
 }
