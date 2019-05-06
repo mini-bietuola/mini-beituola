@@ -10,6 +10,8 @@ import java.util.List;
 
 import com.netease.mini.bietuola.entity.Team;
 
+import com.netease.mini.bietuola.web.util.JsonResponse;
+
 /**
  * @Description
  * @Auther ctl
@@ -70,4 +72,7 @@ public interface TeamService {
      * @return
      */
     boolean queryTodayCheckStatus(Long userId, Long teamId);
+
+    JsonResponse getBaseInfo(Long teamId, Long userId);
+
 }

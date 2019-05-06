@@ -18,6 +18,7 @@ public interface TeamMapper {
 
     /**
      * 根据小组的状态查询小组详情列表
+     *
      * @param teamStatus 队伍状态信息
      * @return
      */
@@ -25,6 +26,7 @@ public interface TeamMapper {
 
     /**
      * 根据小组id查询小组详情
+     *
      * @param teamId
      * @return
      */
@@ -32,18 +34,66 @@ public interface TeamMapper {
 
     /**
      * 新建小组
+     *
      * @param team
      * @return
      */
     int save(Team team);
 
+    /**
+     * 查询所有小组
+     *
+     * @return
+     */
     List<Team> listTeam();
 
+    /**
+     * 根据类别查询小组
+     *
+     * @param categoryId 类别ID
+     * @return
+     */
     List<Team> getTeamByCategory(Long categoryId);
 
+    /**
+     * 根据ID查询小组
+     *
+     * @param teamId
+     * @return
+     */
     Team getTeamById(long teamId);
 
+    /**
+     * 统计小组当前人数
+     *
+     * @param teamId 小组ID
+     * @return
+     */
     int countMember(long teamId);
 
+    /**
+     * 更新小组状态
+     *
+     * @param startDate  开始日期
+     * @param teamStatus 小组状态
+     * @param teamId     小组ID
+     * @return
+     */
     int updateStatus(@Param("startDate") long startDate, @Param("teamStatus") TeamStatus teamStatus, @Param("teamId") long teamId);
+
+    /**
+     * 通过Id查询小组基本信息
+     *
+     * @param teamId
+     * @return
+     */
+    Team selectTeamInfoById(Long teamId);
+
+    /**
+     * 计算小组当前人数
+     *
+     * @param teamId
+     * @return
+     */
+    int countCurrentMemberNum(Long teamId);
 }
