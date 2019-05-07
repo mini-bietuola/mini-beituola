@@ -306,7 +306,7 @@ public class TeamServiceImpl implements TeamService {
             teamVo.setTotlescore(totalScore);
             teamVo.setAwardAmount(userTeamMapper.selectAwardAmountByUserIdTeamId(userId, teamId).toString());
 
-            //将teamVo放入redis缓存
+            //将teamVo放入redis缓存，过期时间一天
             redisService.set(Constants.TEAM_DETAIL_PREFIX + teamId, teamVo, 60 * 60 * 24);
         } else {
             teamVo = redisTeamVo;
