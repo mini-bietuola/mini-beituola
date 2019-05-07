@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhang on 2019/5/6.
@@ -56,21 +57,21 @@ public class ScheduleTask {
             Long current = System.currentTimeMillis();
             if (current >= timeCheck + day * 24 * 60 * 60 * 1000) {
                 //小组状态由进行转换为已结束
-                teamMapper.updateStatus(team.getStartDate(), TeamStatus.FINISHED, team.getId());
+                Long teamId = team.getId();
+                teamMapper.updateStatus(team.getStartDate(), TeamStatus.FINISHED, teamId);
                 //资金的计算工作
-                List<User> userList = userMapper.getAllUserByTeamId(team.getId()); // todo 只查询必要字段
+                List<Map<String, Long>> mapList = checkRecordMapper.queryCheckTimeByTeamId(teamId);
+
                 //小组总的打卡数
                 int sum = 0;
-                for (User user : userList) {
-                    sum += checkRecordMapper.CountCheckTimeByUserId(user.getId(), team.getId()); // todo 提前保存每个用户的打卡次数
+                for (Map<String, Long> map : mapList) {
+                    sum += map.get("times");
                 }
-                if (sum != 0) {
-                    for (User user : userList) {
-                        int times = checkRecordMapper.CountCheckTimeByUserId(user.getId(), team.getId());
-                        // todo 乘以总人数
-                        user.setAmount(user.getAmount().add(team.getFee().divide(new BigDecimal(sum)).multiply(new BigDecimal(times))));
-                        userMapper.updateByUserId(user); // todo 单独更新钱
-                    }
+                for (Map<String, Long> map : mapList) {
+                    BigDecimal fee = team.getFee().multiply(new BigDecimal(team.getMemberNum()))
+                            .multiply(new BigDecimal(map.get("times"))).divide(new BigDecimal(sum));
+                    Long userId = map.get("userId");
+                    userMapper.updateUserAmount(fee, userId);
                 }
             }
         }
