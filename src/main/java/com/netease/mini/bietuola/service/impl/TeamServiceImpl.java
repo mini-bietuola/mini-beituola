@@ -4,6 +4,7 @@ import com.netease.mini.bietuola.config.redis.RedisService;
 import com.netease.mini.bietuola.config.redis.component.RedisLock;
 import com.netease.mini.bietuola.config.session.SessionService;
 import com.netease.mini.bietuola.constant.Constants;
+import com.netease.mini.bietuola.constant.StartType;
 import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.*;
 import com.netease.mini.bietuola.mapper.*;
@@ -250,7 +251,7 @@ public class TeamServiceImpl implements TeamService {
                 return false;
             }
             if ((team.getMemberNum() - currentNum) == 1) {
-                long startDate = DateUtil.getDayZeroTime(DateUtil.getTimeOffsetDays(System.currentTimeMillis(), 1));
+                long startDate = team.getStartType() == StartType.FULL_PEOPLE ? DateUtil.getDayZeroTime(DateUtil.getTimeOffsetDays(System.currentTimeMillis(), 1)) : team.getStartDate();
                 teamMapper.updateStatus(startDate, TeamStatus.WAITING_START, teamId);
             }
             return true;
