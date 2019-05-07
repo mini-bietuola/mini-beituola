@@ -129,6 +129,8 @@ public class TeamServiceImpl implements TeamService {
                     TeamDetailVo teamDetailVo = new TeamDetailVo();
                     teamDetailVo.setTeam(team);
                     teamDetailVo.setNumOfJoin(team.getMemberNum().longValue());
+                    Integer checkTime = checkRecordMapper.CountCheckTimeByUserId(userId, team.getId());
+                    teamDetailVo.setCheckDays(checkTime.longValue());
                     teamDetailVoList.add(teamDetailVo);
                 }
             }
@@ -151,17 +153,21 @@ public class TeamServiceImpl implements TeamService {
         UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
         Integer startTime = team.getStartTime();
         Integer endTime = team.getEndTime();
+        Long startDay = team.getStartDate();
+        Integer days = team.getDuration();
         long current = System.currentTimeMillis();
         long zero = current / (1000 * 24 * 3600) * (1000 * 24 * 3600) - TimeZone.getDefault().getRawOffset();
-        if (current >= zero + startTime * 60 * 1000 && current <= zero + endTime * 60 * 1000) {
-            List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
-            if (checkRecordList.size() == 0) {
-                checkRecordMapper.save(teamId, current);
+        if(current>=startDay&&current<=startDay+days*24*60*60*1000){
+            if (current >= zero + startTime * 60 * 1000 && current <= zero + endTime * 60 * 1000) {
+                List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
+                if (checkRecordList.size() == 0) {
+                    checkRecordMapper.save(teamId, current);
+                }
+                String key = Constants.REDIS_CACHE_PREFIX+userId+"_"+teamId+"_"+DateUtil.getTodayStart();
+                redisService.delete(key);
+                //TODO 删除进行中小组详情的缓存
+                return true;
             }
-            String key = Constants.REDIS_CACHE_PREFIX+userId+"_"+teamId+"_"+DateUtil.getTodayStart();
-            redisService.delete(key);
-            //TODO 删除进行中小组详情的缓存
-            return true;
         }
         return false;
     }
