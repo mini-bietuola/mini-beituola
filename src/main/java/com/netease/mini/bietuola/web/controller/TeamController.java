@@ -12,6 +12,7 @@ import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.service.CategoryService;
 import com.netease.mini.bietuola.service.TeamService;
 import com.netease.mini.bietuola.web.controller.query.common.PageQuery;
+import com.netease.mini.bietuola.web.util.HttpUtils;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 import com.netease.mini.bietuola.web.util.ResultCode;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class TeamController {
     private final TeamService teamService;
     private final CategoryService categoryService;
     private final SessionService sessionService;
-
+    static String default_img="https://bietuola.nos-eastchina1.126.net/dcd36fc34be747fab44dec9ccea8d813.jpg";
     public TeamController(TeamService teamService, CategoryService categoryService, SessionService sessionService) {
         this.teamService = teamService;
         this.categoryService =categoryService;
@@ -45,30 +46,38 @@ public class TeamController {
     }
 
     @PostMapping
-    public JsonResponse create(String name,String avatarUrl,String imgUrl,BigDecimal fee,Long startDate,Integer duration,Integer startTime, Integer endTime,Integer memberNum,String desc,Long categoryId, StartType startType) {
-        Team h=new Team();
-        h.setName(name);
-        h.setAvatarUrl(avatarUrl);
-        h.setImgUrl(imgUrl);
-        h.setFee(fee);
-        h.setDuration(duration);
-        h.setStartTime(startTime);
-        h.setEndTime(endTime);
-        h.setMemberNum(memberNum);
-        h.setDesc(desc);
-        h.setActivityStatus(TeamStatus.RECUIT);
-        h.setCategoryId(categoryId);
-        h.setStartType(startType);
-        if(h.getStartType()==StartType.FULL_PEOPLE){
-            h.setStartDate(null);
+    public JsonResponse create(String name, String avatarUrl, String imgUrl, BigDecimal fee, Long startDate, Integer duration, Integer startTime, Integer endTime, Integer memberNum, String desc, Long categoryId, StartType startType, Long maxRecuitDat) {
+        Team team = new Team();
+        team.setName(name);
+        if (HttpUtils.checkUrl(avatarUrl)) {
+            team.setAvatarUrl(avatarUrl);
+        } else {
+            team.setAvatarUrl(default_img);
         }
-        h.setStartTime(startTime);
-        h.setEndTime(endTime);
+        team.setImgUrl(imgUrl);
+        team.setFee(fee);
+        team.setDuration(duration);
+        if (startTime < endTime) {
+            team.setStartTime(startTime);
+            team.setEndTime(endTime);
+        }
+        if (memberNum > 2 && memberNum < 100) {
+            team.setMemberNum(memberNum);
+        }
+        team.setDesc(desc);
+        team.setActivityStatus(TeamStatus.RECUIT);
+        team.setCategoryId(categoryId);
+        team.setStartType(startType);
+        if (team.getStartType() == StartType.SCHEDULE) {
+            team.setStartDate(startDate);
+        } else {
+            team.setMaxRecuitDate(maxRecuitDat);
+        }
         long time = System.currentTimeMillis();
-        h.setCreateTime(time);
-        h.setUpdateTime(time);
-        h.setCreateUserId(sessionService.getCurrentUserId());
-        if (teamService.save(h)) {
+        team.setCreateTime(time);
+        team.setUpdateTime(time);
+        team.setCreateUserId(sessionService.getCurrentUserId());
+        if (teamService.save(team)) {
             LOG.info("创建小组");
             return JsonResponse.success();
         }
