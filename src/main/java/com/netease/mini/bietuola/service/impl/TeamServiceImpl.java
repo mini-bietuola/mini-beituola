@@ -283,7 +283,6 @@ public class TeamServiceImpl implements TeamService {
         redisTeamVo = (TeamBaseInfoVo) redisService.get(Constants.TEAM_DETAIL_PREFIX + teamId);
         //如果缓存未命中，则从数据库查找数据
         if (redisTeamVo == null) {
-
             Team team = teamMapper.selectTeamInfoById(teamId);
             if (team == null) {
                 return JsonResponse.codeOf(-1).setMsg("小组参数错误！");
@@ -293,6 +292,30 @@ public class TeamServiceImpl implements TeamService {
             if (team.getActivityStatus() == TeamStatus.RECUIT) {
                 currentMemberNum = teamMapper.countCurrentMemberNum(teamId);
             }
+            //进行中和结束状态需要查询小组成员打卡信息
+            if(team.getActivityStatus() == TeamStatus.PROCCESSING || team.getActivityStatus() == TeamStatus.FINISHED){
+                List<User> userList = userMapper.getAllUserByTeamId(teamId);
+                List<CheckDetailVo> checkDetailVoList = new ArrayList<CheckDetailVo>();
+
+                int unit_score = categoryMapper.selectScoreById(team.getCategoryId());
+                int myCheckTime = 0;
+                int myScore = 0;
+                int totalScore = 0;
+                for (User tempUser : userList) {
+                    int checkTime = checkRecordMapper.CountCheckTimeByUserId(tempUser.getId(), teamId);
+                    int tempScore = checkTime * unit_score;
+                    checkDetailVoList.add(new CheckDetailVo(tempUser, checkTime, tempScore));
+                    totalScore += tempScore;
+                }
+                teamVo.setCheckDetailList(checkDetailVoList);
+                teamVo.setMyCheckTime(myCheckTime);
+                teamVo.setMyCheckscore(myScore);
+                teamVo.setTotlescore(totalScore);
+                teamVo.setAwardAmount(userTeamMapper.selectAwardAmountByUserIdTeamId(userId, teamId).toString());
+            }
+
+            teamVo.setTeam(team);
+            teamVo.setCurrentMemberNum(currentMemberNum);
             //如果队伍状态为进行中，需要设置当前天数字段
             if (team.getActivityStatus() == TeamStatus.PROCCESSING) {
                 long currentMillis = System.currentTimeMillis();
@@ -300,27 +323,6 @@ public class TeamServiceImpl implements TeamService {
                 teamVo.setCurrentDay(currentDay);
             }
 
-            teamVo.setTeam(team);
-            teamVo.setCurrentMemberNum(currentMemberNum);
-
-            List<User> userList = userMapper.getAllUserByTeamId(teamId);
-            List<CheckDetailVo> checkDetailVoList = new ArrayList<CheckDetailVo>();
-
-            int unit_score = categoryMapper.selectScoreById(team.getCategoryId());
-            int myCheckTime = 0;
-            int myScore = 0;
-            int totalScore = 0;
-            for (User tempUser : userList) {
-                int checkTime = checkRecordMapper.CountCheckTimeByUserId(tempUser.getId(), teamId);
-                int tempScore = checkTime * unit_score;
-                checkDetailVoList.add(new CheckDetailVo(tempUser, checkTime, tempScore));
-                totalScore += tempScore;
-            }
-            teamVo.setCheckDetailList(checkDetailVoList);
-            teamVo.setMyCheckTime(myCheckTime);
-            teamVo.setMyCheckscore(myScore);
-            teamVo.setTotlescore(totalScore);
-            teamVo.setAwardAmount(userTeamMapper.selectAwardAmountByUserIdTeamId(userId, teamId).toString());
 
             //将teamVo放入redis缓存，过期时间一天
             redisService.set(Constants.TEAM_DETAIL_PREFIX + teamId, teamVo, 60 * 60 * 24);
@@ -335,11 +337,13 @@ public class TeamServiceImpl implements TeamService {
 
     //装配个人打卡次数和个人打卡积分
     private TeamBaseInfoVo AssembleMyCheckInfo(TeamBaseInfoVo teamVo, Long userId){
-        for(CheckDetailVo tempCheckVo: teamVo.getCheckDetailList()){
-            if (tempCheckVo.getUser().getId() == userId) {
-                teamVo.setMyCheckTime(tempCheckVo.getCheckTime());
-                teamVo.setMyCheckscore(tempCheckVo.getScore());
-                break;
+        if(teamVo.getTeam().getActivityStatus() == TeamStatus.PROCCESSING || teamVo.getTeam().getActivityStatus() == TeamStatus.FINISHED) {
+            for (CheckDetailVo tempCheckVo : teamVo.getCheckDetailList()) {
+                if (tempCheckVo.getUser().getId() == userId) {
+                    teamVo.setMyCheckTime(tempCheckVo.getCheckTime());
+                    teamVo.setMyCheckscore(tempCheckVo.getScore());
+                    break;
+                }
             }
         }
         return teamVo;
