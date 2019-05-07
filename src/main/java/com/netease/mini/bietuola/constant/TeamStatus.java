@@ -16,7 +16,8 @@ public enum TeamStatus implements IntEnum {
     RECUIT(1, "招募中"),
     RECUIT_FAILED(2, "招募失败"),
     PROCCESSING(3, "进行中"),
-    FINISHED(4, "结束");
+    FINISHED(4, "结束"),
+    WAITING_START(5,"招募完成待开始");
 
     private final int intValue;
     private final String desc;

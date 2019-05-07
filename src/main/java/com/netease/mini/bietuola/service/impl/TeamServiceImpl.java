@@ -72,6 +72,7 @@ public class TeamServiceImpl implements TeamService {
     public List<TeamDetailVo> findRecuitTeamDetail(Long userId) {
         List<TeamDetailVo> teamDetailVoList = new ArrayList<>();
         List<Team> teamList = teamMapper.findTeamByActivityStatus(TeamStatus.RECUIT);
+        List<Team> teamList1 = teamMapper.findTeamByActivityStatus(TeamStatus.WAITING_START);
         List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(userId);
         for (UserTeam userTeam : userTeamList) {
             for (Team team : teamList) {
@@ -79,6 +80,14 @@ public class TeamServiceImpl implements TeamService {
                     TeamDetailVo teamDetailVo = new TeamDetailVo();
                     teamDetailVo.setTeam(team);
                     teamDetailVo.setNumOfJoin(userTeamMapper.findTeamJoinNum(team.getId()));
+                    teamDetailVoList.add(teamDetailVo);
+                }
+            }
+            for (Team team : teamList1) {
+                if (userTeam.getTeamId() == team.getId()) {
+                    TeamDetailVo teamDetailVo = new TeamDetailVo();
+                    teamDetailVo.setNumOfJoin(team.getMemberNum().longValue());
+                    teamDetailVo.setTeam(team);
                     teamDetailVoList.add(teamDetailVo);
                 }
             }
