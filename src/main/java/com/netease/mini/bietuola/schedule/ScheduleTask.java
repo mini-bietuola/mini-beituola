@@ -76,4 +76,18 @@ public class ScheduleTask {
         }
     }
 
+    @Scheduled(cron = "0 1 0 * * ?")
+    public void task2() {
+
+        System.out.println("招募中-->招募失败；招募完成待开始-->进行中，执行定时任务");
+    }
+
+    /**
+     * 招募中-->招募失败；招募完成待开始-->进行中
+     */
+    public void changeRecuit() {
+        teamMapper.findTeamByActivityStatus(TeamStatus.WAITING_START);
+
+    }
+
 }
