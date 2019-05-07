@@ -61,4 +61,9 @@ public class ScheduleTaskTest {
         calendar.set(2019,4,5);
         System.out.println(calendar.getTime().getTime());
     }
+
+    @Test
+    public void testChangeRecuit() {
+        teamMapper.changeRecuitToFailForFullPeople(System.currentTimeMillis());
+    }
 }
