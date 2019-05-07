@@ -251,7 +251,7 @@ public class TeamServiceImpl implements TeamService {
             }
             if ((team.getMemberNum() - currentNum) == 1) {
                 long startDate = DateUtil.getDayZeroTime(DateUtil.getTimeOffsetDays(System.currentTimeMillis(), 1));
-                teamMapper.updateStatus(startDate, TeamStatus.PROCCESSING, teamId);
+                teamMapper.updateStatus(startDate, TeamStatus.WAITING_START, teamId);
             }
             return true;
         } finally {
