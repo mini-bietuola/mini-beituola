@@ -46,7 +46,7 @@ public class TeamController {
     }
 
     @PostMapping
-    public JsonResponse create(String name, String avatarUrl, String imgUrl, BigDecimal fee, Long startDate, Integer duration, Integer startTime, Integer endTime, Integer memberNum, String desc, Long categoryId, StartType startType, Long maxRecuitDat) {
+    public JsonResponse create(String name, String avatarUrl, String imgUrl, BigDecimal fee, Long startDate, Integer duration, Integer startTime, Integer endTime, Integer memberNum, String desc, Long categoryId, StartType startType, Long maxRecuitDate) {
         Team team = new Team();
         team.setName(name);
         if (HttpUtils.checkUrl(avatarUrl)) {
@@ -60,9 +60,13 @@ public class TeamController {
         if (startTime < endTime) {
             team.setStartTime(startTime);
             team.setEndTime(endTime);
+        } else {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("保存失败");
         }
-        if (memberNum > 2 && memberNum < 100) {
+        if (memberNum >= 2 && memberNum <= 100) {
             team.setMemberNum(memberNum);
+        } else {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("保存失败");
         }
         team.setDesc(desc);
         team.setActivityStatus(TeamStatus.RECUIT);
@@ -71,7 +75,7 @@ public class TeamController {
         if (team.getStartType() == StartType.SCHEDULE) {
             team.setStartDate(startDate);
         } else {
-            team.setMaxRecuitDate(maxRecuitDat);
+            team.setMaxRecuitDate(maxRecuitDate);
         }
         long time = System.currentTimeMillis();
         team.setCreateTime(time);
