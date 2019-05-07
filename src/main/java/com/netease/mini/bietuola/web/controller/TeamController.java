@@ -45,29 +45,28 @@ public class TeamController {
     }
 
     @PostMapping
-    public JsonResponse create(String name,String avatarUrl,String imgUrl,BigDecimal fee,Long startDate,Integer duration,Integer startTime, Integer endTime,Integer memberNum,String desc,TeamStatus activityStatus,Long categoryId, StartType startType,Long createTime,Long updateTime) {
+    public JsonResponse create(String name,String avatarUrl,String imgUrl,BigDecimal fee,Long startDate,Integer duration,Integer startTime, Integer endTime,Integer memberNum,String desc,Long categoryId, StartType startType) {
         Team h=new Team();
         h.setName(name);
         h.setAvatarUrl(avatarUrl);
         h.setImgUrl(imgUrl);
         h.setFee(fee);
-        h.setStartDate(startDate);
         h.setDuration(duration);
         h.setStartTime(startTime);
         h.setEndTime(endTime);
         h.setMemberNum(memberNum);
         h.setDesc(desc);
-        h.setActivityStatus(activityStatus);
+        h.setActivityStatus(TeamStatus.RECUIT);
         h.setCategoryId(categoryId);
         h.setStartType(startType);
         if(h.getStartType()==StartType.FULL_PEOPLE){
-            h.setStartTime(null);
-            h.setEndTime(null);
+            h.setStartDate(null);
         }
         h.setStartTime(startTime);
         h.setEndTime(endTime);
-        h.setCreateTime(createTime);
-        h.setUpdateTime(updateTime);
+        long time = System.currentTimeMillis();
+        h.setCreateTime(time);
+        h.setUpdateTime(time);
         h.setCreateUserId(sessionService.getCurrentUserId());
         if (teamService.save(h)) {
             LOG.info("创建小组");

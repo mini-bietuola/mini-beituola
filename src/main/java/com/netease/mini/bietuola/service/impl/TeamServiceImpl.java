@@ -53,12 +53,19 @@ public class TeamServiceImpl implements TeamService {
         long userId = team.getCreateUserId();
         BigDecimal fee = team.getFee();
         BigDecimal amount = userMapper.getAmount(userId);
-        if (amount.compareTo(fee) > 0) {
-            BigDecimal newAmount = amount.subtract(fee);
-            userMapper.updateAmount(newAmount, userId);
-            return teamMapper.save(team) == 1;
+        if (amount.compareTo(fee) < 0) {
+            return false;
         }
-        return false;
+        teamMapper.save(team);
+        Long teamId = team.getId();
+        UserTeam userTeam = new UserTeam();
+        userTeam.setUserId(userId);
+        userTeam.setTeamId(teamId);
+        userTeam.setCreateTime(System.currentTimeMillis());
+        userTeamMapper.insert(userTeam);
+        BigDecimal newAmount = amount.subtract(fee);
+        userMapper.updateAmount(newAmount, userId);
+        return true;
     }
 
     @Override
