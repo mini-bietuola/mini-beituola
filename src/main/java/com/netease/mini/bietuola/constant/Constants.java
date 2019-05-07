@@ -9,4 +9,6 @@ public class Constants {
 
     public static String REDIS_LOCK_PREFIX = "btl_lock_";
 
+    public static String TEAM_DETAIL_PREFIX = "team_detail_";
+
 }
