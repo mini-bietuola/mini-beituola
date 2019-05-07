@@ -33,4 +33,17 @@
         and team_id=#{teamId}
         )
     </select>
+
+    <select id="queryCheckTimeByTeamId" resultMap="checkTimeMap">
+        SELECT ut.user_id, count(*) times from check_record u inner join
+        (SELECT id,user_id from user_team WHERE team_id = #{teamId}) ut
+        on u.user_team_id = ut.id
+        group by ut.user_id
+    </select>
+
+    <resultMap id="checkTimeMap" type="map">
+        <result column="user_id" property="userId" javaType="long"  />
+        <result column="times" property="times" javaType="long" />
+    </resultMap>
+
 </mapper>
