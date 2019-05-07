@@ -12,6 +12,7 @@ import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.service.CategoryService;
 import com.netease.mini.bietuola.service.TeamService;
 import com.netease.mini.bietuola.web.controller.query.common.PageQuery;
+import com.netease.mini.bietuola.web.util.HttpUtils;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 import com.netease.mini.bietuola.web.util.ResultCode;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class TeamController {
     private final TeamService teamService;
     private final CategoryService categoryService;
     private final SessionService sessionService;
-
+    static String default_img="https://bietuola.nos-eastchina1.126.net/dcd36fc34be747fab44dec9ccea8d813.jpg";
     public TeamController(TeamService teamService, CategoryService categoryService, SessionService sessionService) {
         this.teamService = teamService;
         this.categoryService =categoryService;
@@ -45,22 +46,36 @@ public class TeamController {
     }
 
     @PostMapping
-    public JsonResponse create(String name,String avatarUrl,String imgUrl,BigDecimal fee,Long startDate,Integer duration,Integer startTime, Integer endTime,Integer memberNum,String desc,Long categoryId, StartType startType) {
-        Team team=new Team();
+    public JsonResponse create(String name, String avatarUrl, String imgUrl, BigDecimal fee, Long startDate, Integer duration, Integer startTime, Integer endTime, Integer memberNum, String desc, Long categoryId, StartType startType, Long maxRecuitDate) {
+        Team team = new Team();
         team.setName(name);
-        team.setAvatarUrl(avatarUrl);
+        if (HttpUtils.checkUrl(avatarUrl)) {
+            team.setAvatarUrl(avatarUrl);
+        } else {
+            team.setAvatarUrl(default_img);
+        }
         team.setImgUrl(imgUrl);
         team.setFee(fee);
         team.setDuration(duration);
-        team.setStartTime(startTime);
-        team.setEndTime(endTime);
-        team.setMemberNum(memberNum);
+        if (startTime < endTime) {
+            team.setStartTime(startTime);
+            team.setEndTime(endTime);
+        } else {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("保存失败");
+        }
+        if (memberNum >= 2 && memberNum <= 100) {
+            team.setMemberNum(memberNum);
+        } else {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("保存失败");
+        }
         team.setDesc(desc);
         team.setActivityStatus(TeamStatus.RECUIT);
         team.setCategoryId(categoryId);
         team.setStartType(startType);
-        if(team.getStartType()==StartType.FULL_PEOPLE){
-            team.setStartDate(null);
+        if (team.getStartType() == StartType.SCHEDULE) {
+            team.setStartDate(startDate);
+        } else {
+            team.setMaxRecuitDate(maxRecuitDate);
         }
         long time = System.currentTimeMillis();
         team.setCreateTime(time);
