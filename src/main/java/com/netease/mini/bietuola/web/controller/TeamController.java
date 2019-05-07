@@ -46,31 +46,27 @@ public class TeamController {
 
     @PostMapping
     public JsonResponse create(String name,String avatarUrl,String imgUrl,BigDecimal fee,Long startDate,Integer duration,Integer startTime, Integer endTime,Integer memberNum,String desc,Long categoryId, StartType startType) {
-        Team h=new Team();
-        h.setName(name);
-        h.setAvatarUrl(avatarUrl);
-        h.setImgUrl(imgUrl);
-        h.setFee(fee);
-        h.setStartDate(startDate);
-        h.setDuration(duration);
-        h.setStartTime(startTime);
-        h.setEndTime(endTime);
-        h.setMemberNum(memberNum);
-        h.setDesc(desc);
-        h.setActivityStatus(TeamStatus.RECUIT);
-        h.setCategoryId(categoryId);
-        h.setStartType(startType);
-        if(h.getStartType()==StartType.FULL_PEOPLE){
-            h.setStartTime(null);
-            h.setEndTime(null);
+        Team team=new Team();
+        team.setName(name);
+        team.setAvatarUrl(avatarUrl);
+        team.setImgUrl(imgUrl);
+        team.setFee(fee);
+        team.setDuration(duration);
+        team.setStartTime(startTime);
+        team.setEndTime(endTime);
+        team.setMemberNum(memberNum);
+        team.setDesc(desc);
+        team.setActivityStatus(TeamStatus.RECUIT);
+        team.setCategoryId(categoryId);
+        team.setStartType(startType);
+        if(team.getStartType()==StartType.FULL_PEOPLE){
+            team.setStartDate(null);
         }
-        h.setStartTime(startTime);
-        h.setEndTime(endTime);
         long time = System.currentTimeMillis();
-        h.setCreateTime(time);
-        h.setUpdateTime(time);
-        h.setCreateUserId(sessionService.getCurrentUserId());
-        if (teamService.save(h)) {
+        team.setCreateTime(time);
+        team.setUpdateTime(time);
+        team.setCreateUserId(sessionService.getCurrentUserId());
+        if (teamService.save(team)) {
             LOG.info("创建小组");
             return JsonResponse.success();
         }
