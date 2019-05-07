@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +40,10 @@ public class CommonController {
      * @return
      */
     @PostMapping("/object/upload")
-    public JsonResponse uploadObj(MultipartFile object) {
+    public JsonResponse uploadObj(MultipartFile object, HttpServletRequest request) {
+        LOG.info("fileupload, content-type: {}", request.getContentType());
         if (object == null || object.isEmpty()) {
+            LOG.warn("fileupload, object is null");
             return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("上传文件为空");
         }
         String originFilename = object.getOriginalFilename();
