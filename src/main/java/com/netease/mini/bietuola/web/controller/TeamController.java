@@ -51,7 +51,6 @@ public class TeamController {
         h.setAvatarUrl(avatarUrl);
         h.setImgUrl(imgUrl);
         h.setFee(fee);
-        h.setStartDate(startDate);
         h.setDuration(duration);
         h.setStartTime(startTime);
         h.setEndTime(endTime);
@@ -61,8 +60,7 @@ public class TeamController {
         h.setCategoryId(categoryId);
         h.setStartType(startType);
         if(h.getStartType()==StartType.FULL_PEOPLE){
-            h.setStartTime(null);
-            h.setEndTime(null);
+            h.setStartDate(null);
         }
         h.setStartTime(startTime);
         h.setEndTime(endTime);
