@@ -13,6 +13,7 @@ import com.netease.mini.bietuola.web.util.DateUtil;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 import com.netease.mini.bietuola.web.vo.CheckDetailVo;
 import com.netease.mini.bietuola.web.vo.TeamBaseInfoVo;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -165,7 +166,9 @@ public class TeamServiceImpl implements TeamService {
                 }
                 String key = Constants.REDIS_CACHE_PREFIX+userId+"_"+teamId+"_"+DateUtil.getTodayStart();
                 redisService.delete(key);
-                //TODO 删除进行中小组详情的缓存
+
+                //删除进行中小组详情的缓存
+                redisService.delete(Constants.TEAM_DETAIL_PREFIX + teamId);
                 return true;
             }
         }
