@@ -158,6 +158,9 @@ public class TeamServiceImpl implements TeamService {
             if (checkRecordList.size() == 0) {
                 checkRecordMapper.save(teamId, current);
             }
+            String key = Constants.REDIS_CACHE_PREFIX+userId+"_"+teamId+"_"+DateUtil.getTodayStart();
+            redisService.delete(key);
+            //TODO 删除进行中小组详情的缓存
             return true;
         }
         return false;
@@ -165,12 +168,19 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public boolean queryTodayCheckStatus(Long userId, Long teamId) {
-        UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
-        List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
-        if (checkRecordList.size() == 0) {
-            return false;
+        String key = Constants.REDIS_CACHE_PREFIX+userId+"_"+teamId+"_"+DateUtil.getTodayStart();
+        if(redisService.get(key)!=null){
+            return (boolean)redisService.get(key);
+        }else {
+            UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
+            List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
+            if (checkRecordList.size() == 0) {
+                redisService.set(key,false);
+                return false;
+            }
+            redisService.set(key,true);
+            return true;
         }
-        return true;
     }
 
     public static void main(String[] args) {
