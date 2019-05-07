@@ -130,6 +130,8 @@ public class TeamServiceImpl implements TeamService {
                     TeamDetailVo teamDetailVo = new TeamDetailVo();
                     teamDetailVo.setTeam(team);
                     teamDetailVo.setNumOfJoin(team.getMemberNum().longValue());
+                    Integer checkTime = checkRecordMapper.CountCheckTimeByUserId(userId, team.getId());
+                    teamDetailVo.setCheckDays(checkTime.longValue());
                     teamDetailVoList.add(teamDetailVo);
                 }
             }
@@ -152,26 +154,40 @@ public class TeamServiceImpl implements TeamService {
         UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
         Integer startTime = team.getStartTime();
         Integer endTime = team.getEndTime();
+        Long startDay = team.getStartDate();
+        Integer days = team.getDuration();
         long current = System.currentTimeMillis();
         long zero = current / (1000 * 24 * 3600) * (1000 * 24 * 3600) - TimeZone.getDefault().getRawOffset();
-        if (current >= zero + startTime * 60 * 1000 && current <= zero + endTime * 60 * 1000) {
-            List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
-            if (checkRecordList.size() == 0) {
-                checkRecordMapper.save(teamId, current);
+        if(current>=startDay&&current<=startDay+days*24*60*60*1000){
+            if (current >= zero + startTime * 60 * 1000 && current <= zero + endTime * 60 * 1000) {
+                List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
+                if (checkRecordList.size() == 0) {
+                    checkRecordMapper.save(teamId, current);
+                }
+                String key = Constants.REDIS_CACHE_PREFIX+userId+"_"+teamId+"_"+DateUtil.getTodayStart();
+                redisService.delete(key);
+                //TODO 删除进行中小组详情的缓存
+                return true;
             }
-            return true;
         }
         return false;
     }
 
     @Override
     public boolean queryTodayCheckStatus(Long userId, Long teamId) {
-        UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
-        List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
-        if (checkRecordList.size() == 0) {
-            return false;
+        String key = Constants.REDIS_CACHE_PREFIX+userId+"_"+teamId+"_"+DateUtil.getTodayStart();
+        if(redisService.get(key)!=null){
+            return (boolean)redisService.get(key);
+        }else {
+            UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
+            List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
+            if (checkRecordList.size() == 0) {
+                redisService.set(key,false);
+                return false;
+            }
+            redisService.set(key,true);
+            return true;
         }
-        return true;
     }
 
     public static void main(String[] args) {
@@ -262,48 +278,72 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public JsonResponse getBaseInfo(Long teamId, Long userId) {
-        Team team = teamMapper.selectTeamInfoById(teamId);
         TeamBaseInfoVo teamVo = new TeamBaseInfoVo();
-        //招募中需要计算当前人数
-        int currentMemberNum = team.getMemberNum();
-        if (team.getActivityStatus() == TeamStatus.RECUIT) {
-            currentMemberNum = teamMapper.countCurrentMemberNum(teamId);
-        }
-        //如果队伍状态为进行中，需要设置当前天数字段
-        if (team.getActivityStatus() == TeamStatus.PROCCESSING) {
-            long currentMillis = System.currentTimeMillis();
-            int currentDay = (int) ((currentMillis - team.getStartDate()) / (1000 * 60 * 60 * 24) + 1);
-            teamVo.setCurrentDay(currentDay);
-        }
+        TeamBaseInfoVo redisTeamVo;
+        //从缓存获得小组详情信息
+        redisTeamVo = (TeamBaseInfoVo) redisService.get(Constants.TEAM_DETAIL_PREFIX + teamId);
+        //如果缓存未命中，则从数据库查找数据
+        if (redisTeamVo == null) {
 
-        teamVo.setTeam(team);
-        teamVo.setCurrentMemberNum(currentMemberNum);
-
-        List<User> userList = userMapper.getAllUserByTeamId(teamId);
-        List<CheckDetailVo> checkDetailVoList = new ArrayList<CheckDetailVo>();
-
-        int unit_score = categoryMapper.selectScoreById(team.getCategoryId());
-        int myCheckTime = 0;
-        int myScore = 0;
-        int totalScore = 0;
-        for (User tempUser : userList) {
-            int checkTime = checkRecordMapper.CountCheckTimeByUserId(tempUser.getId(), teamId);
-            int tempScore = checkTime * unit_score;
-            if (tempUser.getId() == userId) {
-                myCheckTime = checkTime;
-                myScore = tempScore;
-            } else {
-                checkDetailVoList.add(new CheckDetailVo(tempUser, checkTime, tempScore));
+            Team team = teamMapper.selectTeamInfoById(teamId);
+            if (team == null) {
+                return JsonResponse.codeOf(-1).setMsg("小组参数错误！");
             }
-            totalScore += tempScore;
+            //招募中需要计算当前人数
+            int currentMemberNum = team.getMemberNum();
+            if (team.getActivityStatus() == TeamStatus.RECUIT) {
+                currentMemberNum = teamMapper.countCurrentMemberNum(teamId);
+            }
+            //如果队伍状态为进行中，需要设置当前天数字段
+            if (team.getActivityStatus() == TeamStatus.PROCCESSING) {
+                long currentMillis = System.currentTimeMillis();
+                int currentDay = (int) ((currentMillis - team.getStartDate()) / (1000 * 60 * 60 * 24) + 1);
+                teamVo.setCurrentDay(currentDay);
+            }
+
+            teamVo.setTeam(team);
+            teamVo.setCurrentMemberNum(currentMemberNum);
+
+            List<User> userList = userMapper.getAllUserByTeamId(teamId);
+            List<CheckDetailVo> checkDetailVoList = new ArrayList<CheckDetailVo>();
+
+            int unit_score = categoryMapper.selectScoreById(team.getCategoryId());
+            int myCheckTime = 0;
+            int myScore = 0;
+            int totalScore = 0;
+            for (User tempUser : userList) {
+                int checkTime = checkRecordMapper.CountCheckTimeByUserId(tempUser.getId(), teamId);
+                int tempScore = checkTime * unit_score;
+                checkDetailVoList.add(new CheckDetailVo(tempUser, checkTime, tempScore));
+                totalScore += tempScore;
+            }
+            teamVo.setCheckDetailList(checkDetailVoList);
+            teamVo.setMyCheckTime(myCheckTime);
+            teamVo.setMyCheckscore(myScore);
+            teamVo.setTotlescore(totalScore);
+            teamVo.setAwardAmount(userTeamMapper.selectAwardAmountByUserIdTeamId(userId, teamId).toString());
+
+            //将teamVo放入redis缓存，过期时间一天
+            redisService.set(Constants.TEAM_DETAIL_PREFIX + teamId, teamVo, 60 * 60 * 24);
+        } else {
+            teamVo = redisTeamVo;
         }
-        teamVo.setCheckDetailList(checkDetailVoList);
-        teamVo.setMyCheckTime(myCheckTime);
-        teamVo.setMyCheckscore(myScore);
-        teamVo.setTotlescore(totalScore);
-        teamVo.setAwardAmount(userTeamMapper.selectAwardAmountByUserIdTeamId(userId, teamId).toString());
+
+        teamVo = AssembleMyCheckInfo(teamVo, userId);
 
         return JsonResponse.success(teamVo);
+    }
+
+    //装配个人打卡次数和个人打卡积分
+    private TeamBaseInfoVo AssembleMyCheckInfo(TeamBaseInfoVo teamVo, Long userId){
+        for(CheckDetailVo tempCheckVo: teamVo.getCheckDetailList()){
+            if (tempCheckVo.getUser().getId() == userId) {
+                teamVo.setMyCheckTime(tempCheckVo.getCheckTime());
+                teamVo.setMyCheckscore(tempCheckVo.getScore());
+                break;
+            }
+        }
+        return teamVo;
     }
 
 

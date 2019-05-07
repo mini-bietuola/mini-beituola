@@ -61,4 +61,11 @@ public interface UserMapper {
      */
     List<User> getAllUserByTeamId(Long teamId);
 
+    /**
+     * 更新用户的金额
+     * @param amount
+     * @return
+     */
+    int updateUserAmount(@Param("amount") BigDecimal amount,@Param("userId") Long id);
+
 }

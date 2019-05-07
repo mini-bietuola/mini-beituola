@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhang on 2019/5/1.
@@ -47,6 +48,12 @@ public class CheckRecordMapperTest {
         Long userTeamId=1l;
         List<CheckRecord> checkRecordList=checkRecordMapper.CheckStatus(userTeamId,startTime,endTime);
         Assert.assertNotNull(checkRecordList);
+    }
+
+    @Test
+    public void queryCheckTimeByTeamIdTest(){
+        List<Map<String, Long>> list=checkRecordMapper.queryCheckTimeByTeamId(1l);
+        Assert.assertNotNull(list);
     }
 
     public static void main(String[] args) {

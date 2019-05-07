@@ -4,6 +4,7 @@ import com.netease.mini.bietuola.entity.CheckRecord;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhang on 2019/5/1.
@@ -40,4 +41,11 @@ public interface CheckRecordMapper {
      * @return
      */
     int CountCheckTimeByUserId(@Param("userId") Long userId, @Param("teamId") Long teamId);
+
+    /**
+     * 统计小组内用户的打卡记录
+     * @param teamId
+     * @return
+     */
+    List<Map<String, Long>> queryCheckTimeByTeamId(@Param("teamId") Long teamId);
 }
