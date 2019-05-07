@@ -7,6 +7,7 @@ package com.netease.mini.bietuola.constant;
  */
 public class Constants {
 
-    public static String REDIS_LOCK_PREFIX = "btl_lock_";
+    public static String REDIS_LOCK_PREFIX  = "btl_lock_";
 
+    public static String REDIS_CACHE_PREFIX = "btl_cache_";
 }

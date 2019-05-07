@@ -46,4 +46,11 @@ public interface UserTeamMapper {
      */
     BigDecimal selectAwardAmountByUserIdTeamId(@Param("userId") Long userId, @Param("teamId") Long teamId);
 
+    /**
+     * 更新个人在一个小组中最后获得的钱
+     * @param userId
+     * @param teamId
+     * @param fee
+     */
+    int updateAwardAmount(@Param("userId") Long userId, @Param("teamId") Long teamId, @Param("fee") BigDecimal fee);
 }

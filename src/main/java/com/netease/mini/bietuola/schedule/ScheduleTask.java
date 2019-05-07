@@ -2,21 +2,18 @@ package com.netease.mini.bietuola.schedule;
 
 import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.Team;
-import com.netease.mini.bietuola.entity.User;
 import com.netease.mini.bietuola.mapper.CheckRecordMapper;
 import com.netease.mini.bietuola.mapper.TeamMapper;
 import com.netease.mini.bietuola.mapper.UserMapper;
-import com.netease.mini.bietuola.service.TeamService;
-import org.checkerframework.checker.units.qual.A;
+import com.netease.mini.bietuola.mapper.UserTeamMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zhang on 2019/5/6.
@@ -27,12 +24,14 @@ public class ScheduleTask {
     private final TeamMapper teamMapper;
     private final CheckRecordMapper checkRecordMapper;
     private final UserMapper userMapper;
+    private final UserTeamMapper userTeamMapper;
 
     @Autowired
-    public ScheduleTask(TeamMapper teamMapper, CheckRecordMapper checkRecordMapper, UserMapper userMapper) {
+    public ScheduleTask(TeamMapper teamMapper, CheckRecordMapper checkRecordMapper, UserMapper userMapper, UserTeamMapper userTeamMapper) {
         this.teamMapper = teamMapper;
         this.checkRecordMapper = checkRecordMapper;
         this.userMapper = userMapper;
+        this.userTeamMapper = userTeamMapper;
     }
 
     @Scheduled(cron = "30 0 0 * * ?")
@@ -56,21 +55,22 @@ public class ScheduleTask {
             Long current = System.currentTimeMillis();
             if (current >= timeCheck + day * 24 * 60 * 60 * 1000) {
                 //小组状态由进行转换为已结束
-                teamMapper.updateStatus(team.getStartDate(), TeamStatus.FINISHED, team.getId());
+                Long teamId = team.getId();
+                teamMapper.updateStatus(team.getStartDate(), TeamStatus.FINISHED, teamId);
                 //资金的计算工作
-                List<User> userList = userMapper.getAllUserByTeamId(team.getId()); // todo 只查询必要字段
+                List<Map<String, Long>> mapList = checkRecordMapper.queryCheckTimeByTeamId(teamId);
+
                 //小组总的打卡数
                 int sum = 0;
-                for (User user : userList) {
-                    sum += checkRecordMapper.CountCheckTimeByUserId(user.getId(), team.getId()); // todo 提前保存每个用户的打卡次数
+                for (Map<String, Long> map : mapList) {
+                    sum += map.get("times");
                 }
-                if (sum != 0) {
-                    for (User user : userList) {
-                        int times = checkRecordMapper.CountCheckTimeByUserId(user.getId(), team.getId());
-                        // todo 乘以总人数
-                        user.setAmount(user.getAmount().add(team.getFee().divide(new BigDecimal(sum)).multiply(new BigDecimal(times))));
-                        userMapper.updateByUserId(user); // todo 单独更新钱
-                    }
+                for (Map<String, Long> map : mapList) {
+                    BigDecimal fee = team.getFee().multiply(new BigDecimal(team.getMemberNum()))
+                            .multiply(new BigDecimal(map.get("times"))).divide(new BigDecimal(sum), 2, RoundingMode.DOWN);
+                    Long userId = map.get("userId");
+                    userMapper.updateUserAmount(fee, userId);
+                    userTeamMapper.updateAwardAmount(userId, teamId, fee);
                 }
             }
         }

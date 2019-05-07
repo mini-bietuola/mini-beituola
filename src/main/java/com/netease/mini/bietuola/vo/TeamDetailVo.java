@@ -19,6 +19,11 @@ public class TeamDetailVo {
      */
     private Boolean checkRecordInfo=false;
 
+    /**
+     * 打卡天数
+     */
+    private Long checkDays;
+
     public Team getTeam() {
         return team;
     }
@@ -41,5 +46,13 @@ public class TeamDetailVo {
 
     public void setCheckRecordInfo(boolean checkRecordInfo) {
         this.checkRecordInfo = checkRecordInfo;
+    }
+
+    public Long getCheckDays() {
+        return checkDays;
+    }
+
+    public void setCheckDays(Long checkDays) {
+        this.checkDays = checkDays;
     }
 }
