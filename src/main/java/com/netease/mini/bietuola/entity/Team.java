@@ -69,6 +69,10 @@ public class Team implements Serializable {
      */
     private StartType startType;
     /**
+     * 人满即开情况下的最长招募天数，过期还没招满即招募失败
+     */
+    private Long maxRecuitDate;
+    /**
      * 创建时间
      */
     private Long createTime;
@@ -275,6 +279,20 @@ public class Team implements Serializable {
      */
     public StartType getStartType() {
         return startType;
+    }
+
+    /**
+     * 人满即开情况下的最长招募天数，过期还没招满即招募失败
+     */
+    public void setMaxRecuitDate(Long maxRecuitDate) {
+        this.maxRecuitDate = maxRecuitDate;
+    }
+
+    /**
+     * 人满即开情况下的最长招募天数，过期还没招满即招募失败
+     */
+    public Long getMaxRecuitDate() {
+        return maxRecuitDate;
     }
 
     /**

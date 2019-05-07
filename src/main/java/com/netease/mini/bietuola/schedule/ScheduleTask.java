@@ -76,18 +76,38 @@ public class ScheduleTask {
         }
     }
 
-    @Scheduled(cron = "0 1 0 * * ?")
+    @Scheduled(cron = "10 0 0 * * ?")
     public void task2() {
-
+        changeRecuit();
         System.out.println("招募中-->招募失败；招募完成待开始-->进行中，执行定时任务");
     }
 
     /**
-     * 招募中-->招募失败；招募完成待开始-->进行中
+     * 招募完成待开始-->进行中；招募中-->招募失败
      */
     public void changeRecuit() {
-        teamMapper.findTeamByActivityStatus(TeamStatus.WAITING_START);
-
+        long current = System.currentTimeMillis();
+        // 招募完成待开始-->进行中
+        teamMapper.changeWaitingToProcessing(current);
+//        List<Team> waitingTeams = teamMapper.findTeamByActivityStatus(TeamStatus.WAITING_START);
+//        for (Team t: waitingTeams) {
+//            Long startDate = t.getStartDate();
+//            long current = System.currentTimeMillis();
+//            if (current > startDate) { // todo 可在sql中直接加入该过滤条件以及修改状态操作，整过程只要一条sql即可
+//                teamMapper.updateStatus(startDate, TeamStatus.PROCCESSING, t.getId());
+//            }
+//        }
+        // 招募中-->招募失败
+        teamMapper.changeRecuitToFailForSchedule(current); // 针对预设时间类型
+        teamMapper.changeRecuitToFailForFullPeople(current); // 针对人满即开类型
+//        List<Team> recuitTeams = teamMapper.findTeamByActivityStatus(TeamStatus.RECUIT);
+//        for (Team t: recuitTeams) {
+//            Long startDate = t.getStartDate();
+//            long current = System.currentTimeMillis();
+//            if (current > startDate) {
+//                teamMapper.updateStatus(startDate, TeamStatus.RECUIT_FAILED, t.getId());
+//            }
+//        }
     }
 
 }
