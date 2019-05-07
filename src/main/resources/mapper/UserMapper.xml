@@ -77,6 +77,7 @@
       score=#{score},create_time=#{createTime},update_time=#{updateTime},status=#{status}
       WHERE id=#{id}
     </update>
+
    <select id="getAmount" parameterType="long" resultType="BigDecimal">
        SELECT amount
        FROM user

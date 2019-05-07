@@ -96,4 +96,22 @@ public interface TeamMapper {
      * @return
      */
     int countCurrentMemberNum(Long teamId);
+
+    /**
+     * 定时任务，每日凌晨状态检查和改变：招募完成待开始-->进行中
+     * @param current
+     */
+    void changeWaitingToProcessing(@Param("current") Long current);
+
+    /**
+     * 定时任务，每日凌晨状态检查和改变：招募中-->招募失败，针对预设时间类型
+     * @param current
+     */
+    void changeRecuitToFailForSchedule(@Param("current") Long current);
+
+    /**
+     * 定时任务，每日凌晨状态检查和改变：招募中-->招募失败，针对人满即开类型
+     * @param current
+     */
+    void changeRecuitToFailForFullPeople(@Param("current") Long current);
 }
