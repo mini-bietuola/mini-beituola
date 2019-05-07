@@ -15,33 +15,37 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
  * Created by zhang on 2019/5/6.
  */
 @Component
-@Configuration
-@EnableScheduling
 public class ScheduleTask {
 
-    @Autowired
-    private TeamMapper teamMapper;
-    @Autowired
-    private CheckRecordMapper checkRecordMapper;
-    @Autowired
-    private UserMapper userMapper;
+    private final TeamMapper teamMapper;
+    private final CheckRecordMapper checkRecordMapper;
+    private final UserMapper userMapper;
 
-    @Scheduled(cron = "0/50 * * * * ?")
+    @Autowired
+    public ScheduleTask(TeamMapper teamMapper, CheckRecordMapper checkRecordMapper, UserMapper userMapper) {
+        this.teamMapper = teamMapper;
+        this.checkRecordMapper = checkRecordMapper;
+        this.userMapper = userMapper;
+    }
+
+    @Scheduled(cron = "30 0 0 * * ?")
     public void task() {
         teamStatusChange();
-        System.out.println("执行定时任务");
+        System.out.println("进行中-->已结束，执行定时任务");
     }
 
     /**
      * 小组状态由进行变化为结束
      */
     public void teamStatusChange() {
+        // todo 记录数过多时的优化处理
         List<Team> teamList = teamMapper.findTeamByActivityStatus(TeamStatus.PROCCESSING);
         for (Team team : teamList) {
             //打卡开始时间
@@ -54,20 +58,22 @@ public class ScheduleTask {
                 //小组状态由进行转换为已结束
                 teamMapper.updateStatus(team.getStartDate(), TeamStatus.FINISHED, team.getId());
                 //资金的计算工作
-                List<User> userList = userMapper.getAllUserByTeamId(team.getId());
+                List<User> userList = userMapper.getAllUserByTeamId(team.getId()); // todo 只查询必要字段
                 //小组总的打卡数
                 int sum = 0;
                 for (User user : userList) {
-                    sum += checkRecordMapper.CountCheckTimeByUserId(user.getId(), team.getId());
+                    sum += checkRecordMapper.CountCheckTimeByUserId(user.getId(), team.getId()); // todo 提前保存每个用户的打卡次数
                 }
                 if (sum != 0) {
                     for (User user : userList) {
                         int times = checkRecordMapper.CountCheckTimeByUserId(user.getId(), team.getId());
+                        // todo 乘以总人数
                         user.setAmount(user.getAmount().add(team.getFee().divide(new BigDecimal(sum)).multiply(new BigDecimal(times))));
-                        userMapper.updateByUserId(user);
+                        userMapper.updateByUserId(user); // todo 单独更新钱
                     }
                 }
             }
         }
     }
+
 }
