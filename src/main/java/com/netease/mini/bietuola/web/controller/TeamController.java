@@ -2,6 +2,7 @@ package com.netease.mini.bietuola.web.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.util.StringUtil;
 import com.netease.mini.bietuola.config.redis.RedisService;
 import com.netease.mini.bietuola.config.session.SessionService;
 import com.netease.mini.bietuola.constant.StartType;
@@ -11,7 +12,9 @@ import com.netease.mini.bietuola.entity.RecomTeamInfo;
 import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.service.CategoryService;
 import com.netease.mini.bietuola.service.TeamService;
+import com.netease.mini.bietuola.vo.TeamDetailVo;
 import com.netease.mini.bietuola.web.controller.query.common.PageQuery;
+import com.netease.mini.bietuola.web.util.HttpUtils;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 import com.netease.mini.bietuola.web.util.ResultCode;
 import org.slf4j.Logger;
@@ -37,7 +40,7 @@ public class TeamController {
     private final TeamService teamService;
     private final CategoryService categoryService;
     private final SessionService sessionService;
-
+    static String default_img="https://bietuola.nos-eastchina1.126.net/dcd36fc34be747fab44dec9ccea8d813.jpg";
     public TeamController(TeamService teamService, CategoryService categoryService, SessionService sessionService) {
         this.teamService = teamService;
         this.categoryService =categoryService;
@@ -45,22 +48,36 @@ public class TeamController {
     }
 
     @PostMapping
-    public JsonResponse create(String name,String avatarUrl,String imgUrl,BigDecimal fee,Long startDate,Integer duration,Integer startTime, Integer endTime,Integer memberNum,String desc,Long categoryId, StartType startType) {
-        Team team=new Team();
+    public JsonResponse create(String name, String avatarUrl, String imgUrl, BigDecimal fee, Long startDate, Integer duration, Integer startTime, Integer endTime, Integer memberNum, String desc, Long categoryId, StartType startType, Long maxRecuitDate) {
+        Team team = new Team();
         team.setName(name);
-        team.setAvatarUrl(avatarUrl);
+        if (HttpUtils.checkUrl(avatarUrl)) {
+            team.setAvatarUrl(avatarUrl);
+        } else {
+            team.setAvatarUrl(default_img);
+        }
         team.setImgUrl(imgUrl);
         team.setFee(fee);
         team.setDuration(duration);
-        team.setStartTime(startTime);
-        team.setEndTime(endTime);
-        team.setMemberNum(memberNum);
+        if (startTime < endTime) {
+            team.setStartTime(startTime);
+            team.setEndTime(endTime);
+        } else {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("保存失败");
+        }
+        if (memberNum >= 2 && memberNum <= 100) {
+            team.setMemberNum(memberNum);
+        } else {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("保存失败");
+        }
         team.setDesc(desc);
         team.setActivityStatus(TeamStatus.RECUIT);
         team.setCategoryId(categoryId);
         team.setStartType(startType);
-        if(team.getStartType()==StartType.FULL_PEOPLE){
-            team.setStartDate(null);
+        if (team.getStartType() == StartType.SCHEDULE) {
+            team.setStartDate(startDate);
+        } else {
+            team.setMaxRecuitDate(maxRecuitDate);
         }
         long time = System.currentTimeMillis();
         team.setCreateTime(time);
@@ -75,15 +92,16 @@ public class TeamController {
 
     @GetMapping("/category")
     public JsonResponse listcategory() {
-        List<Category> lists=categoryService.listcategory();
-        if (lists!=null) {
+        List<Category> lists = categoryService.listcategory();
+        if (lists != null) {
             LOG.info("显示类型");
             return JsonResponse.success(lists);
         }
         return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("显示失败");
     }
+
     @RequestMapping("/findRecuitTeamDetail")
-    public JsonResponse findRecuitTeamDetail(){
+    public JsonResponse findRecuitTeamDetail() {
         Long userid = sessionService.getCurrentUserId();
         JsonResponse jsonResponse = JsonResponse.success();
         jsonResponse.setData(teamService.findRecuitTeamDetail(userid));
@@ -91,7 +109,7 @@ public class TeamController {
     }
 
     @RequestMapping("/findProccessingTeamDetail")
-    public JsonResponse findProccessingTeamDetail(){
+    public JsonResponse findProccessingTeamDetail() {
         Long userid = sessionService.getCurrentUserId();
         JsonResponse jsonResponse = JsonResponse.success();
         jsonResponse.setData(teamService.findProccessingTeamDetail(userid));
@@ -99,7 +117,7 @@ public class TeamController {
     }
 
     @RequestMapping("/findFinishedTeamDetail")
-    public JsonResponse findFinishedTeamDetail(){
+    public JsonResponse findFinishedTeamDetail() {
         Long userid = sessionService.getCurrentUserId();
         JsonResponse jsonResponse = JsonResponse.success();
         jsonResponse.setData(teamService.findFinishedTeamDetail(userid));
@@ -107,22 +125,23 @@ public class TeamController {
     }
 
     @RequestMapping("/checkRecord")
-    public JsonResponse checkRecord(Long teamId){
+    public JsonResponse checkRecord(Long teamId) {
         Long userid = sessionService.getCurrentUserId();
-        if(teamService.checkRecord(userid,teamId)){
+        if (teamService.checkRecord(userid, teamId)) {
             return JsonResponse.success().setMsg("打卡成功");
         }
         return JsonResponse.codeOf(ResultCode.ERROR_CHECK_RECORD_FAIL).setMsg("打卡失败");
     }
 
     @RequestMapping("/queryTodayCheckStatus")
-    public JsonResponse queryTodayCheckStatus(Long teamId){
+    public JsonResponse queryTodayCheckStatus(Long teamId) {
         Long userid = sessionService.getCurrentUserId();
-        if(teamService.queryTodayCheckStatus(userid,teamId)){
+        if (teamService.queryTodayCheckStatus(userid, teamId)) {
             return JsonResponse.success().setMsg("今日已打卡").setData(true);
         }
         return JsonResponse.success().setMsg("今日未打卡").setData(false);
     }
+
     /**
      * 获取推荐小组列表
      *
@@ -157,13 +176,45 @@ public class TeamController {
 
     /**
      * 获取小组详情
+     *
      * @param teamId
      * @return
      */
     @RequestMapping("/baseinfo")
-    public JsonResponse getBaseInfo(Long teamId){
+    public JsonResponse getBaseInfo(Long teamId) {
         Long userId = sessionService.getCurrentUserId();
         return teamService.getBaseInfo(teamId, userId);
+    }
+
+    /**
+     * 搜索小组
+     *
+     * @param name 小组名称
+     * @return
+     */
+    @RequestMapping("/search")
+    public JsonResponse searchTeam(String name) {
+        List<RecomTeamInfo> teamList = new ArrayList<>();
+        if (StringUtil.isNotEmpty(name)) {
+            teamList = teamService.searchTeam(name);
+        }
+        return JsonResponse.success(teamList);
+    }
+
+    /**
+     * 个人查询小组
+     *
+     * @param teamStatus 小组状态
+     * @param name       小组名称
+     * @return
+     */
+    @RequestMapping("/find")
+    public JsonResponse findTeam(TeamStatus teamStatus, String name) {
+        List<TeamDetailVo> teams = new ArrayList<>();
+        if (StringUtil.isNotEmpty(name)) {
+            teams = teamService.findTeam(teamStatus, name);
+        }
+        return JsonResponse.success(teams);
     }
 
 }

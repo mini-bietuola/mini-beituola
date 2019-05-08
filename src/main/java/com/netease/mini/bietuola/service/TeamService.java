@@ -1,16 +1,12 @@
 package com.netease.mini.bietuola.service;
 
+import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.RecomTeamInfo;
 import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
-import com.netease.mini.bietuola.web.controller.query.TeamQuery;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.netease.mini.bietuola.web.util.JsonResponse;
 
 import java.util.List;
-
-import com.netease.mini.bietuola.entity.Team;
-
-import com.netease.mini.bietuola.web.util.JsonResponse;
 
 /**
  * @Description
@@ -21,6 +17,7 @@ public interface TeamService {
 
     /**
      * 查询userId对应的招募小组详情列表
+     *
      * @param userId
      * @return
      */
@@ -28,6 +25,7 @@ public interface TeamService {
 
     /**
      * 查询userId对应的进行小组详情列表
+     *
      * @param userId
      * @return
      */
@@ -35,11 +33,14 @@ public interface TeamService {
 
     /**
      * 查询userId对应的已结束小组详情列表
+     *
      * @param userId
      * @return
      */
     List<TeamDetailVo> findFinishedTeamDetail(Long userId);
+
     boolean save(Team team);
+
     /**
      * 查询推荐小组
      *
@@ -59,6 +60,7 @@ public interface TeamService {
 
     /**
      * 打卡操作
+     *
      * @param userId
      * @param teamId
      * @return
@@ -67,6 +69,7 @@ public interface TeamService {
 
     /**
      * 查询今日打卡情况
+     *
      * @param userId
      * @param teamId
      * @return
@@ -74,5 +77,22 @@ public interface TeamService {
     boolean queryTodayCheckStatus(Long userId, Long teamId);
 
     JsonResponse getBaseInfo(Long teamId, Long userId);
+
+    /**
+     * 查询小组
+     *
+     * @param name 小组名称
+     * @return
+     */
+    List<RecomTeamInfo> searchTeam(String name);
+
+    /**
+     * 个人查询小组
+     *
+     * @param teamStatus 小组状态
+     * @param name       小组名称
+     * @return
+     */
+    List<TeamDetailVo> findTeam(TeamStatus teamStatus, String name);
 
 }
