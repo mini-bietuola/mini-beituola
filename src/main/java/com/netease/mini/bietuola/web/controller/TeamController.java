@@ -90,7 +90,7 @@ public class TeamController {
             LOG.info("创建小组");
             return JsonResponse.success();
         }
-        return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("保存失败");
+        return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("押金不足");
     }
 
     @GetMapping("/category")

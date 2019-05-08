@@ -54,6 +54,7 @@ public class TeamServiceImpl implements TeamService {
         BigDecimal fee = team.getFee();
         BigDecimal amount = userMapper.getAmount(userId);
         if (amount.compareTo(fee) < 0) {
+//            JsonResponse.codeOf(-1).setMsg("小组参数错误！");
             return false;
         }
         teamMapper.save(team);
