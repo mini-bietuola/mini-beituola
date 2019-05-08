@@ -112,6 +112,8 @@ public class TeamServiceImpl implements TeamService {
                             teamDetailVo.setCheckRecordInfo(true);
                         }
                     }
+                    Integer checkTime = checkRecordMapper.CountCheckTimeByUserId(userId, team.getId());
+                    teamDetailVo.setCheckDays(checkTime.longValue());
                     teamDetailVoList.add(teamDetailVo);
                 }
             }
