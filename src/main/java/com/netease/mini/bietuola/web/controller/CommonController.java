@@ -42,6 +42,7 @@ public class CommonController {
     @PostMapping("/object/upload")
     public JsonResponse uploadObj(MultipartFile object, HttpServletRequest request) {
         LOG.info("fileupload, content-type: {}", request.getContentType());
+        LOG.info("fileupload, parameters: {}", request.getParameterNames());
         if (object == null || object.isEmpty()) {
             LOG.warn("fileupload, object is null");
             return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("上传文件为空");
