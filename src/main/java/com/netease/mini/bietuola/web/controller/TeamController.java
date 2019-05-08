@@ -14,6 +14,7 @@ import com.netease.mini.bietuola.service.CategoryService;
 import com.netease.mini.bietuola.service.TeamService;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
 import com.netease.mini.bietuola.web.controller.query.common.PageQuery;
+import com.netease.mini.bietuola.web.util.DateUtil;
 import com.netease.mini.bietuola.web.util.HttpUtils;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 import com.netease.mini.bietuola.web.util.ResultCode;
@@ -48,7 +49,7 @@ public class TeamController {
     }
 
     @PostMapping
-    public JsonResponse create(String name, String avatarUrl, String imgUrl, BigDecimal fee, Long startDate, Integer duration, Integer startTime, Integer endTime, Integer memberNum, String desc, Long categoryId, StartType startType, Long maxRecuitDate) {
+    public JsonResponse create(String name, String avatarUrl, String imgUrl, BigDecimal fee, Long startDate, Integer duration, Long startTime, Long endTime, Integer memberNum, String desc, Long categoryId, StartType startType, Long maxRecuitDate) {
         Team team = new Team();
         team.setName(name);
         if (HttpUtils.checkUrl(avatarUrl)) {
@@ -60,8 +61,10 @@ public class TeamController {
         team.setFee(fee);
         team.setDuration(duration);
         if (startTime < endTime) {
-            team.setStartTime(startTime);
-            team.setEndTime(endTime);
+            Integer st = DateUtil.getCurDayMinutes(startTime);
+            Integer ed=DateUtil.getCurDayMinutes(endTime);
+            team.setStartTime(st);
+            team.setEndTime(ed);
         } else {
             return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("保存失败");
         }

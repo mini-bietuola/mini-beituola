@@ -125,4 +125,10 @@ public class DateUtil {
         return c.getTimeInMillis();
     }
 
+    public static Integer getCurDayMinutes(Long time) {
+        Date date = new Date(time);
+        int hours = date.getHours();
+        int minutes = date.getMinutes();
+        return hours * 60 + minutes;
+    }
 }
