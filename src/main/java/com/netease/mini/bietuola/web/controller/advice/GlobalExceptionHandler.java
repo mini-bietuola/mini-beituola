@@ -30,6 +30,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public JsonResponse handleError(HttpServletRequest req, Exception e) {
         LOG.error("服务全局异常", e);
-        return JsonResponse.codeOf(ResultCode.ERROR_EXCEPTION_GLOBAL).setMsg("服务异常，请稍后再试");
+        return JsonResponse.codeOf(ResultCode.ERROR_EXCEPTION_GLOBAL).setMsg("服务异常，请稍后再试")
+                .setData(e.getMessage());
     }
 }

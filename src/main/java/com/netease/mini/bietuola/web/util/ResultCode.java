@@ -35,5 +35,5 @@ public interface ResultCode {
 
     /** 服务抛异常，全局处理状态 */
     int ERROR_EXCEPTION_GLOBAL = -9001;
-
+    int BALANCE_NOT_ENOUGH = -1002;
 }

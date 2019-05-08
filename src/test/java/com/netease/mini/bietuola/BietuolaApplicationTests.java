@@ -12,6 +12,7 @@ import com.netease.mini.bietuola.mapper.CategoryMapper;
 import com.netease.mini.bietuola.mapper.HelloMapper;
 import com.netease.mini.bietuola.mapper.TeamMapper;
 import com.netease.mini.bietuola.web.controller.query.HelloQuery;
+import com.netease.mini.bietuola.web.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -34,7 +36,10 @@ public class BietuolaApplicationTests {
     private CategoryMapper categoryMapper;
 	@Test
 	public void contextLoads() {
-	}
+        long l = System.currentTimeMillis();
+        System.out.println(new Date(l));
+        System.out.println(DateUtil.getCurDayMinutes(l));
+    }
 
 	@Test
     public void testHello() {
