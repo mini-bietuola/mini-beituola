@@ -100,7 +100,7 @@ public class TeamController {
             LOG.info("显示类型");
             return JsonResponse.success(lists);
         }
-        return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("显示失败");
+        return JsonResponse.codeOf(ResultCode.BALANCE_NOT_ENOUGH).setMsg("显示失败");
     }
 
     @RequestMapping("/findRecuitTeamDetail")
