@@ -124,6 +124,8 @@ public class UserController {
         if (StringUtils.isAnyBlank(user.getNickname(), user.getAvatarUrl())) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数格式错误");
         }
+        Long currentUserId = sessionService.getCurrentUserId();
+        user.setId(currentUserId);
         return userService.updateBaseInfo(user) ? JsonResponse.success()
                 : JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("用户信息更新失败");
     }
