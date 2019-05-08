@@ -16,6 +16,12 @@
         id, user_id, team_id, create_time, award_amount
     </sql>
 
+    <update id="updateAwardAmount">
+      UPDATE user_team
+      SET award_amount = #{fee}
+      WHERE user_id = #{userId} AND team_id = #{teamId}
+    </update>
+
     <select id="selectAwardAmountByUserIdTeamId" parameterType="map" resultType="java.math.BigDecimal">
         select award_amount
         from user_team

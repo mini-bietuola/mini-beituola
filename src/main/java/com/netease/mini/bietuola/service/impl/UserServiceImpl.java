@@ -18,7 +18,8 @@ import java.math.BigDecimal;
 public class UserServiceImpl implements UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    private static final String DEFAULT_USER_AVATAR_URL = "http://static.tongjilab.cn/image/20170127/172713501.png";
+//    private static final String DEFAULT_USER_AVATAR_URL = "http://static.tongjilab.cn/image/20170127/172713501.png";
+    private static final String DEFAULT_USER_AVATAR_URL = "https://bietuola.nos-eastchina1.126.net/38dd59ab38454531a65aa4fb686d1182.jpg";
 
     private final UserMapper userMapper;
 
