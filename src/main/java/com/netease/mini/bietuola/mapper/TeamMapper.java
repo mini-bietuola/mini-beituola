@@ -55,6 +55,13 @@ public interface TeamMapper {
      */
     List<Team> getTeamByCategory(Long categoryId);
 
+    /**模糊搜索小组
+     *
+     * @param name 小组名称
+     * @return
+     */
+    List<Team> getTeamByName(String name);
+
     /**
      * 根据ID查询小组
      *
@@ -96,6 +103,15 @@ public interface TeamMapper {
      * @return
      */
     int countCurrentMemberNum(Long teamId);
+
+    /**
+     * 模糊查询个人小组
+     *
+     * @param teamStatusList  小组状态
+     * @param name 小组名称
+     * @return
+     */
+    List<Team> findTeamByStatusList(@Param("teamStatusList") List<TeamStatus> teamStatusList, @Param("name") String name);
 
     /**
      * 定时任务，每日凌晨状态检查和改变：招募完成待开始-->进行中

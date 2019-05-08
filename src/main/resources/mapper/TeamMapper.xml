@@ -36,17 +36,35 @@
         select * from team
         where activity_status=#{teamStatus}
     </select>
+
+    <select id="findTeamByStatusList"  resultMap="BaseResultMap">
+        SELECT *
+        FROM team
+        where name LIKE CONCAT('%',#{name},'%')
+        AND activity_status IN
+        <foreach collection="teamStatusList" item="teamStatus" index="index" open="(" separator="," close=")">
+           #{teamStatus}
+        </foreach>
+    </select>
+
     <select id="listTeam" resultMap="BaseResultMap">
         SELECT *
         FROM team
         WHERE activity_status = 1
     </select>
 
-    <select id="getTeamByCategory" parameterType="Long" resultMap="BaseResultMap">
+    <select id="getTeamByCategory" parameterType="java.lang.Long" resultMap="BaseResultMap">
        SELECT *
        FROM team
        WHERE activity_status = 1
        AND category_id = #{categoryId}
+    </select>
+
+    <select id="getTeamByName" parameterType="String" resultMap="BaseResultMap">
+       SELECT *
+       FROM team
+       WHERE activity_status = 1
+       AND name LIKE CONCAT('%',#{name},'%');
     </select>
 
     <select id="getTeamById" parameterType="long" resultMap="BaseResultMap">

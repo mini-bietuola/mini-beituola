@@ -2,6 +2,7 @@ package com.netease.mini.bietuola.web.controller;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.util.StringUtil;
 import com.netease.mini.bietuola.config.redis.RedisService;
 import com.netease.mini.bietuola.config.session.SessionService;
 import com.netease.mini.bietuola.constant.StartType;
@@ -11,6 +12,7 @@ import com.netease.mini.bietuola.entity.RecomTeamInfo;
 import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.service.CategoryService;
 import com.netease.mini.bietuola.service.TeamService;
+import com.netease.mini.bietuola.vo.TeamDetailVo;
 import com.netease.mini.bietuola.web.controller.query.common.PageQuery;
 import com.netease.mini.bietuola.web.util.HttpUtils;
 import com.netease.mini.bietuola.web.util.JsonResponse;
@@ -90,15 +92,16 @@ public class TeamController {
 
     @GetMapping("/category")
     public JsonResponse listcategory() {
-        List<Category> lists=categoryService.listcategory();
-        if (lists!=null) {
+        List<Category> lists = categoryService.listcategory();
+        if (lists != null) {
             LOG.info("显示类型");
             return JsonResponse.success(lists);
         }
         return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("显示失败");
     }
+
     @RequestMapping("/findRecuitTeamDetail")
-    public JsonResponse findRecuitTeamDetail(){
+    public JsonResponse findRecuitTeamDetail() {
         Long userid = sessionService.getCurrentUserId();
         JsonResponse jsonResponse = JsonResponse.success();
         jsonResponse.setData(teamService.findRecuitTeamDetail(userid));
@@ -106,7 +109,7 @@ public class TeamController {
     }
 
     @RequestMapping("/findProccessingTeamDetail")
-    public JsonResponse findProccessingTeamDetail(){
+    public JsonResponse findProccessingTeamDetail() {
         Long userid = sessionService.getCurrentUserId();
         JsonResponse jsonResponse = JsonResponse.success();
         jsonResponse.setData(teamService.findProccessingTeamDetail(userid));
@@ -114,7 +117,7 @@ public class TeamController {
     }
 
     @RequestMapping("/findFinishedTeamDetail")
-    public JsonResponse findFinishedTeamDetail(){
+    public JsonResponse findFinishedTeamDetail() {
         Long userid = sessionService.getCurrentUserId();
         JsonResponse jsonResponse = JsonResponse.success();
         jsonResponse.setData(teamService.findFinishedTeamDetail(userid));
@@ -122,22 +125,23 @@ public class TeamController {
     }
 
     @RequestMapping("/checkRecord")
-    public JsonResponse checkRecord(Long teamId){
+    public JsonResponse checkRecord(Long teamId) {
         Long userid = sessionService.getCurrentUserId();
-        if(teamService.checkRecord(userid,teamId)){
+        if (teamService.checkRecord(userid, teamId)) {
             return JsonResponse.success().setMsg("打卡成功");
         }
         return JsonResponse.codeOf(ResultCode.ERROR_CHECK_RECORD_FAIL).setMsg("打卡失败");
     }
 
     @RequestMapping("/queryTodayCheckStatus")
-    public JsonResponse queryTodayCheckStatus(Long teamId){
+    public JsonResponse queryTodayCheckStatus(Long teamId) {
         Long userid = sessionService.getCurrentUserId();
-        if(teamService.queryTodayCheckStatus(userid,teamId)){
+        if (teamService.queryTodayCheckStatus(userid, teamId)) {
             return JsonResponse.success().setMsg("今日已打卡").setData(true);
         }
         return JsonResponse.success().setMsg("今日未打卡").setData(false);
     }
+
     /**
      * 获取推荐小组列表
      *
@@ -172,13 +176,45 @@ public class TeamController {
 
     /**
      * 获取小组详情
+     *
      * @param teamId
      * @return
      */
     @RequestMapping("/baseinfo")
-    public JsonResponse getBaseInfo(Long teamId){
+    public JsonResponse getBaseInfo(Long teamId) {
         Long userId = sessionService.getCurrentUserId();
         return teamService.getBaseInfo(teamId, userId);
+    }
+
+    /**
+     * 搜索小组
+     *
+     * @param name 小组名称
+     * @return
+     */
+    @RequestMapping("/search")
+    public JsonResponse searchTeam(String name) {
+        List<RecomTeamInfo> teamList = new ArrayList<>();
+        if (StringUtil.isNotEmpty(name)) {
+            teamList = teamService.searchTeam(name);
+        }
+        return JsonResponse.success(teamList);
+    }
+
+    /**
+     * 个人查询小组
+     *
+     * @param teamStatus 小组状态
+     * @param name       小组名称
+     * @return
+     */
+    @RequestMapping("/find")
+    public JsonResponse findTeam(TeamStatus teamStatus, String name) {
+        List<TeamDetailVo> teams = new ArrayList<>();
+        if (StringUtil.isNotEmpty(name)) {
+            teams = teamService.findTeam(teamStatus, name);
+        }
+        return JsonResponse.success(teams);
     }
 
 }
