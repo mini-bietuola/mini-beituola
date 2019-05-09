@@ -52,6 +52,11 @@ public class AuthInterceptor extends HandlerInterceptorAdapter {
         return true;
     }
 
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        sessionService.destoryThreadLocalSession();
+    }
+
     private void createNotLoginResp(HttpServletResponse response) throws IOException {
         response.setCharacterEncoding("utf-8");
         response.setContentType("application/json; charset=utf-8");

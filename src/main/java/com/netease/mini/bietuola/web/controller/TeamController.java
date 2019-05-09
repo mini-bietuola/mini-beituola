@@ -9,6 +9,7 @@ import com.netease.mini.bietuola.constant.StartType;
 import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.Category;
 import com.netease.mini.bietuola.entity.RecomTeamInfo;
+import com.netease.mini.bietuola.entity.RecomTeamResult;
 import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.service.CategoryService;
 import com.netease.mini.bietuola.service.TeamService;
@@ -18,6 +19,7 @@ import com.netease.mini.bietuola.web.util.DateUtil;
 import com.netease.mini.bietuola.web.util.HttpUtils;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 import com.netease.mini.bietuola.web.util.ResultCode;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,10 +43,11 @@ public class TeamController {
     private final TeamService teamService;
     private final CategoryService categoryService;
     private final SessionService sessionService;
-    static String default_img="https://bietuola.nos-eastchina1.126.net/dcd36fc34be747fab44dec9ccea8d813.jpg";
+    static String default_img = "https://bietuola.nos-eastchina1.126.net/dcd36fc34be747fab44dec9ccea8d813.jpg";
+
     public TeamController(TeamService teamService, CategoryService categoryService, SessionService sessionService) {
         this.teamService = teamService;
-        this.categoryService =categoryService;
+        this.categoryService = categoryService;
         this.sessionService = sessionService;
     }
 
@@ -62,7 +65,7 @@ public class TeamController {
         team.setDuration(duration);
         if (startTime < endTime) {
             Integer st = DateUtil.getCurDayMinutes(startTime);
-            Integer ed=DateUtil.getCurDayMinutes(endTime);
+            Integer ed = DateUtil.getCurDayMinutes(endTime);
             team.setStartTime(st);
             team.setEndTime(ed);
         } else {
@@ -152,12 +155,15 @@ public class TeamController {
      * @return
      */
     @GetMapping("/recommend")
-    public JsonResponse getRecomTeam(Long categoryId, PageQuery pageQuery) {
-        PageHelper.startPage(pageQuery.getPageNumber(), pageQuery.getPageSize());
-        List<RecomTeamInfo> teamInfos = new ArrayList<>();
-        teamInfos=teamService.getRecomTeam(categoryId);
-        PageInfo<RecomTeamInfo> result = new PageInfo<>(teamInfos);
-        return JsonResponse.success(result);
+    public JsonResponse getRecomTeam(Long categoryId, int pageNumber, int pageSize) {
+        if (pageNumber <= 0 || pageSize <= 0) {
+            return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数错误");
+        }
+        RecomTeamResult result = teamService.getRecomTeam(categoryId, pageNumber, pageSize);
+        if (result == null) {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN);
+        }
+        return JsonResponse.success(teamService.getRecomTeam(categoryId, pageNumber, pageSize));
     }
 
     /**
@@ -167,14 +173,14 @@ public class TeamController {
      * @return
      */
     @PostMapping("/participate")
-    public JsonResponse participateTeam(long teamId){
+    public JsonResponse participateTeam(long teamId) {
         if (teamId <= 0) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数错误");
         }
-        if (teamService.participateTeam(teamId)) {
+        if (StringUtils.isEmpty(teamService.participateTeam(teamId))) {
             return JsonResponse.success();
         }
-        return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("加入失败");
+        return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg(teamService.participateTeam(teamId));
     }
 
     /**
@@ -218,6 +224,21 @@ public class TeamController {
             teams = teamService.findTeam(teamStatus, name);
         }
         return JsonResponse.success(teams);
+    }
+
+    /**
+     * 查询小组成员打卡历史
+     *
+     * @param teamId     小组ID
+     * @param currentDay 当前第几天
+     * @return
+     */
+    @RequestMapping("/check-log")
+    public JsonResponse getCheckLog(long teamId, int currentDay) {
+        if (teamId <= 0 || currentDay <= 0) {
+            return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数错误");
+        }
+        return JsonResponse.success(teamService.getCheckLog(teamId, currentDay));
     }
 
 }

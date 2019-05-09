@@ -1,5 +1,7 @@
 package com.netease.mini.bietuola.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.netease.mini.bietuola.config.redis.RedisService;
 import com.netease.mini.bietuola.config.redis.component.RedisLock;
 import com.netease.mini.bietuola.config.session.SessionService;
@@ -109,7 +111,7 @@ public class TeamServiceImpl implements TeamService {
                     teamDetailVo.setNumOfJoin(team.getMemberNum().longValue());
                     List<CheckRecord> checkRecordList = checkRecordMapper.findCheckRecordByUserTeamId(userTeam.getId());
                     for (CheckRecord checkRecord : checkRecordList) {
-                        if (todayCheckRecord(checkRecord.getCheckTime(), team.getStartTime(), team.getEndTime())) {
+                        if (todayCheckRecord(System.currentTimeMillis(), checkRecord.getCheckTime(), team.getStartTime(), team.getEndTime())) {
                             teamDetailVo.setCheckRecordInfo(true);
                         }
                     }
@@ -141,9 +143,9 @@ public class TeamServiceImpl implements TeamService {
         return teamDetailVoList;
     }
 
-    public boolean todayCheckRecord(long checkTime, Integer startTime, Integer endTime) {
-        long current = System.currentTimeMillis();
-        long zero = current / (1000 * 24 * 3600) * (1000 * 24 * 3600) - TimeZone.getDefault().getRawOffset();
+    public boolean todayCheckRecord(long currentDate, long checkTime, Integer startTime, Integer endTime) {
+        //long current = System.currentTimeMillis();
+        long zero = currentDate / (1000 * 24 * 3600) * (1000 * 24 * 3600) - TimeZone.getDefault().getRawOffset();
         if (checkTime >= zero + startTime * 60 * 1000 && checkTime <= zero + endTime * 60 * 1000) {
             return true;
         }
@@ -202,8 +204,10 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<RecomTeamInfo> getRecomTeam(Long categoryId) {
+    public RecomTeamResult getRecomTeam(Long categoryId, int pageNumber, int pageSize) {
+        RecomTeamResult recomTeamResult=new RecomTeamResult();
         List<RecomTeamInfo> recomTeamInfos = new ArrayList<>();
+        PageHelper.startPage(pageNumber, pageSize);
         List<Team> teams = new ArrayList<>();
         if (categoryId != null) {
             teams = teamMapper.getTeamByCategory(categoryId);
@@ -211,8 +215,13 @@ public class TeamServiceImpl implements TeamService {
             teams = teamMapper.listTeam();
         }
         if (CollectionUtils.isEmpty(teams)) {
-            return recomTeamInfos;
+            return null;
         }
+        PageInfo<Team> pageInfo=new PageInfo<>(teams);
+        recomTeamResult.setPageNumber(pageInfo.getPageNum());
+        recomTeamResult.setPageSize(pageInfo.getPageSize());
+        recomTeamResult.setHasPreviousPage(pageInfo.isHasPreviousPage());
+        recomTeamResult.setHasNextPage(pageInfo.isHasNextPage());
         for (Team team : teams) {
             RecomTeamInfo recomTeamInfo = new RecomTeamInfo();
             int currentNum = teamMapper.countMember(team.getId());
@@ -226,34 +235,37 @@ public class TeamServiceImpl implements TeamService {
             recomTeamInfo.setFee(team.getFee());
             recomTeamInfo.setMemberNum(team.getMemberNum());
             recomTeamInfo.setDesc(team.getDesc());
+            recomTeamInfo.setCategoryId(team.getCategoryId());
             recomTeamInfos.add(recomTeamInfo);
         }
-        return recomTeamInfos;
+        recomTeamResult.setTeamInfoList(recomTeamInfos);
+        return recomTeamResult;
     }
 
     @Override
     @Transactional
-    public boolean participateTeam(long teamId) {
+    public String participateTeam(long teamId) {
         long userId = sessionService.getCurrentUserId();
         String key = Constants.REDIS_LOCK_PREFIX + teamId;
         RedisLock lock = redisService.getLock(key);
+        String errMsg="加入失败";
         boolean isLocked = lock.tryLock(10, 10);
         if (!isLocked) {
-            return false;
+            return errMsg;
         }
         try {
             Team team = teamMapper.getTeamById(teamId);
             if (team.getActivityStatus() != TeamStatus.RECUIT) {
-                return false;
+                return errMsg;
             }
             int currentNum = teamMapper.countMember(teamId);
             if (currentNum >= team.getMemberNum()) {
-                return false;
+                return "当前小组人数已满";
             }
             BigDecimal fee = team.getFee();
             BigDecimal amount = userMapper.getAmount(userId);
             if (amount.compareTo(fee) < 0) {
-                    return false;
+                    return "余额不足，请充值";
                 }
             UserTeam userTeam = new UserTeam();
             userTeam.setUserId(userId);
@@ -261,21 +273,21 @@ public class TeamServiceImpl implements TeamService {
             userTeam.setCreateTime(System.currentTimeMillis());
             UserTeam result = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
             if (result != null) {
-                return false;
+                return "你已加入过该小组";
             }
             if (userTeamMapper.insert(userTeam) != 1) {
-                return false;
+                return errMsg;
             }
             BigDecimal newAmount = amount.subtract(fee);
             if (userMapper.updateAmount(newAmount, userId) != 1) {
-                return false;
+                return errMsg;
             }
             if ((team.getMemberNum() - currentNum) == 1) {
                 long startDate = team.getStartType() == StartType.FULL_PEOPLE ? DateUtil.getDayZeroTime(DateUtil.getTimeOffsetDays(System.currentTimeMillis(), 1)) : team.getStartDate();
                 teamMapper.updateStatus(startDate, TeamStatus.WAITING_START, teamId);
             }
             redisService.delete(Constants.TEAM_DETAIL_PREFIX+teamId);
-            return true;
+            return "";
         } finally {
             lock.unlock();
         }
@@ -410,7 +422,7 @@ public class TeamServiceImpl implements TeamService {
                     if(team.getActivityStatus()==TeamStatus.PROCCESSING) {
                         List<CheckRecord> checkRecordList = checkRecordMapper.findCheckRecordByUserTeamId(userTeam.getId());
                         for (CheckRecord checkRecord : checkRecordList) {
-                            if (todayCheckRecord(checkRecord.getCheckTime(), team.getStartTime(), team.getEndTime())) {
+                            if (todayCheckRecord(System.currentTimeMillis(), checkRecord.getCheckTime(), team.getStartTime(), team.getEndTime())) {
                                 teamDetailVo.setCheckRecordInfo(true);
                             }
                         }
@@ -420,6 +432,12 @@ public class TeamServiceImpl implements TeamService {
             }
         }
         return teamDetailVoList;
+    }
+
+    @Override
+    public List<CheckLog> getCheckLog(long teamId, int currentDay) {
+        List<CheckLog> logList=new ArrayList<>();
+        return logList;
     }
 
 
