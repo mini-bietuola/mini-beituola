@@ -55,7 +55,7 @@ public interface TeamService {
      * @param teamId 小组ID
      * @return
      */
-    boolean participateTeam(long teamId);
+    String participateTeam(long teamId);
 
 
     /**

@@ -18,6 +18,7 @@ import com.netease.mini.bietuola.web.util.DateUtil;
 import com.netease.mini.bietuola.web.util.HttpUtils;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 import com.netease.mini.bietuola.web.util.ResultCode;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -171,10 +172,10 @@ public class TeamController {
         if (teamId <= 0) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数错误");
         }
-        if (teamService.participateTeam(teamId)) {
+        if (StringUtils.isEmpty(teamService.participateTeam(teamId))) {
             return JsonResponse.success();
         }
-        return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("加入失败");
+        return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg(teamService.participateTeam(teamId));
     }
 
     /**
@@ -218,6 +219,13 @@ public class TeamController {
             teams = teamService.findTeam(teamStatus, name);
         }
         return JsonResponse.success(teams);
+    }
+
+    @RequestMapping("/check-log")
+    public JsonResponse getCheckHistory(long teamId, int currentDay){
+        if(teamId<=0 || currentDay<=0){
+            return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数错误");
+        }
     }
 
 }

@@ -233,27 +233,28 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional
-    public boolean participateTeam(long teamId) {
+    public String participateTeam(long teamId) {
         long userId = sessionService.getCurrentUserId();
         String key = Constants.REDIS_LOCK_PREFIX + teamId;
         RedisLock lock = redisService.getLock(key);
+        String errMsg="加入失败";
         boolean isLocked = lock.tryLock(10, 10);
         if (!isLocked) {
-            return false;
+            return errMsg;
         }
         try {
             Team team = teamMapper.getTeamById(teamId);
             if (team.getActivityStatus() != TeamStatus.RECUIT) {
-                return false;
+                return errMsg;
             }
             int currentNum = teamMapper.countMember(teamId);
             if (currentNum >= team.getMemberNum()) {
-                return false;
+                return "当前小组人数已满";
             }
             BigDecimal fee = team.getFee();
             BigDecimal amount = userMapper.getAmount(userId);
             if (amount.compareTo(fee) < 0) {
-                    return false;
+                    return "余额不足，请充值";
                 }
             UserTeam userTeam = new UserTeam();
             userTeam.setUserId(userId);
@@ -261,21 +262,21 @@ public class TeamServiceImpl implements TeamService {
             userTeam.setCreateTime(System.currentTimeMillis());
             UserTeam result = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
             if (result != null) {
-                return false;
+                return errMsg;
             }
             if (userTeamMapper.insert(userTeam) != 1) {
-                return false;
+                return errMsg;
             }
             BigDecimal newAmount = amount.subtract(fee);
             if (userMapper.updateAmount(newAmount, userId) != 1) {
-                return false;
+                return errMsg;
             }
             if ((team.getMemberNum() - currentNum) == 1) {
                 long startDate = team.getStartType() == StartType.FULL_PEOPLE ? DateUtil.getDayZeroTime(DateUtil.getTimeOffsetDays(System.currentTimeMillis(), 1)) : team.getStartDate();
                 teamMapper.updateStatus(startDate, TeamStatus.WAITING_START, teamId);
             }
             redisService.delete(Constants.TEAM_DETAIL_PREFIX+teamId);
-            return true;
+            return "";
         } finally {
             lock.unlock();
         }
