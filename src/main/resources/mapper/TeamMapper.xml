@@ -58,6 +58,7 @@
        FROM team
        WHERE activity_status = 1
        AND category_id = #{categoryId}
+       ORDER BY create_time DESC
     </select>
 
     <select id="getTeamByName" parameterType="String" resultMap="BaseResultMap">

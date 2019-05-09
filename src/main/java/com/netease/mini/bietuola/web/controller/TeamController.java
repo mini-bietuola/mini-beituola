@@ -9,6 +9,7 @@ import com.netease.mini.bietuola.constant.StartType;
 import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.Category;
 import com.netease.mini.bietuola.entity.RecomTeamInfo;
+import com.netease.mini.bietuola.entity.RecomTeamResult;
 import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.service.CategoryService;
 import com.netease.mini.bietuola.service.TeamService;
@@ -154,12 +155,15 @@ public class TeamController {
      * @return
      */
     @GetMapping("/recommend")
-    public JsonResponse getRecomTeam(Long categoryId, PageQuery pageQuery) {
-        PageHelper.startPage(pageQuery.getPageNumber(), pageQuery.getPageSize());
-        List<RecomTeamInfo> teamInfos = new ArrayList<>();
-        teamInfos = teamService.getRecomTeam(categoryId);
-        PageInfo<RecomTeamInfo> result = new PageInfo<>(teamInfos);
-        return JsonResponse.success(result);
+    public JsonResponse getRecomTeam(Long categoryId, int pageNumber, int pageSize) {
+        if (pageNumber <= 0 || pageSize <= 0) {
+            return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数错误");
+        }
+        RecomTeamResult result = teamService.getRecomTeam(categoryId, pageNumber, pageSize);
+        if (result == null) {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN);
+        }
+        return JsonResponse.success(teamService.getRecomTeam(categoryId, pageNumber, pageSize));
     }
 
     /**

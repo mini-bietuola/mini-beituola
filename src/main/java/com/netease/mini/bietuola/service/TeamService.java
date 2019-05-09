@@ -1,10 +1,7 @@
 package com.netease.mini.bietuola.service;
 
 import com.netease.mini.bietuola.constant.TeamStatus;
-import com.netease.mini.bietuola.entity.CheckLog;
-import com.netease.mini.bietuola.entity.CheckRecord;
-import com.netease.mini.bietuola.entity.RecomTeamInfo;
-import com.netease.mini.bietuola.entity.Team;
+import com.netease.mini.bietuola.entity.*;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 
@@ -49,7 +46,7 @@ public interface TeamService {
      * @param categoryId 类别ID
      * @return
      */
-    List<RecomTeamInfo> getRecomTeam(Long categoryId);
+    RecomTeamResult getRecomTeam(Long categoryId, int pageNumber, int pageSize);
 
     /**
      * 加入小组

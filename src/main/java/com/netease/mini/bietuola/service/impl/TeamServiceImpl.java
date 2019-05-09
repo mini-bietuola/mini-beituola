@@ -1,5 +1,7 @@
 package com.netease.mini.bietuola.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.netease.mini.bietuola.config.redis.RedisService;
 import com.netease.mini.bietuola.config.redis.component.RedisLock;
 import com.netease.mini.bietuola.config.session.SessionService;
@@ -202,8 +204,10 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<RecomTeamInfo> getRecomTeam(Long categoryId) {
+    public RecomTeamResult getRecomTeam(Long categoryId, int pageNumber, int pageSize) {
+        RecomTeamResult recomTeamResult=new RecomTeamResult();
         List<RecomTeamInfo> recomTeamInfos = new ArrayList<>();
+        PageHelper.startPage(pageNumber, pageSize);
         List<Team> teams = new ArrayList<>();
         if (categoryId != null) {
             teams = teamMapper.getTeamByCategory(categoryId);
@@ -211,8 +215,13 @@ public class TeamServiceImpl implements TeamService {
             teams = teamMapper.listTeam();
         }
         if (CollectionUtils.isEmpty(teams)) {
-            return recomTeamInfos;
+            return null;
         }
+        PageInfo<Team> pageInfo=new PageInfo<>(teams);
+        recomTeamResult.setPageNumber(pageInfo.getPageNum());
+        recomTeamResult.setPageSize(pageInfo.getPageSize());
+        recomTeamResult.setHasPreviousPage(pageInfo.isHasPreviousPage());
+        recomTeamResult.setHasNextPage(pageInfo.isHasNextPage());
         for (Team team : teams) {
             RecomTeamInfo recomTeamInfo = new RecomTeamInfo();
             int currentNum = teamMapper.countMember(team.getId());
@@ -226,9 +235,11 @@ public class TeamServiceImpl implements TeamService {
             recomTeamInfo.setFee(team.getFee());
             recomTeamInfo.setMemberNum(team.getMemberNum());
             recomTeamInfo.setDesc(team.getDesc());
+            recomTeamInfo.setCategoryId(team.getCategoryId());
             recomTeamInfos.add(recomTeamInfo);
         }
-        return recomTeamInfos;
+        recomTeamResult.setTeamInfoList(recomTeamInfos);
+        return recomTeamResult;
     }
 
     @Override
