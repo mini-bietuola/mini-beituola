@@ -1,6 +1,8 @@
 package com.netease.mini.bietuola.service;
 
 import com.netease.mini.bietuola.constant.TeamStatus;
+import com.netease.mini.bietuola.entity.CheckLog;
+import com.netease.mini.bietuola.entity.CheckRecord;
 import com.netease.mini.bietuola.entity.RecomTeamInfo;
 import com.netease.mini.bietuola.entity.Team;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
@@ -94,5 +96,14 @@ public interface TeamService {
      * @return
      */
     List<TeamDetailVo> findTeam(TeamStatus teamStatus, String name);
+
+    /**
+     * 查询小组成员打卡历史
+     *
+     * @param teamId     小组ID
+     * @param currentDay 当前第几天
+     * @return
+     */
+    List<CheckLog> getCheckLog(long teamId, int currentDay);
 
 }

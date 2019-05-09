@@ -64,7 +64,7 @@
        SELECT *
        FROM team
        WHERE activity_status = 1
-       AND name LIKE CONCAT('%',#{name},'%');
+       AND name LIKE concat('%', #{name}, '%');
     </select>
 
     <select id="getTeamById" parameterType="long" resultMap="BaseResultMap">
@@ -76,7 +76,7 @@
     <select id="countMember" parameterType="long" resultType="int">
         SELECT COUNT(id)
         FROM user_team
-        WHERE id = #{teamId}
+        WHERE team_id = #{teamId}
     </select>
 
     <update id="updateStatus">

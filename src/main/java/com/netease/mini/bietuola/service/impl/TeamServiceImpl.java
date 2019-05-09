@@ -109,7 +109,7 @@ public class TeamServiceImpl implements TeamService {
                     teamDetailVo.setNumOfJoin(team.getMemberNum().longValue());
                     List<CheckRecord> checkRecordList = checkRecordMapper.findCheckRecordByUserTeamId(userTeam.getId());
                     for (CheckRecord checkRecord : checkRecordList) {
-                        if (todayCheckRecord(checkRecord.getCheckTime(), team.getStartTime(), team.getEndTime())) {
+                        if (todayCheckRecord(System.currentTimeMillis(), checkRecord.getCheckTime(), team.getStartTime(), team.getEndTime())) {
                             teamDetailVo.setCheckRecordInfo(true);
                         }
                     }
@@ -141,9 +141,9 @@ public class TeamServiceImpl implements TeamService {
         return teamDetailVoList;
     }
 
-    public boolean todayCheckRecord(long checkTime, Integer startTime, Integer endTime) {
-        long current = System.currentTimeMillis();
-        long zero = current / (1000 * 24 * 3600) * (1000 * 24 * 3600) - TimeZone.getDefault().getRawOffset();
+    public boolean todayCheckRecord(long currentDate, long checkTime, Integer startTime, Integer endTime) {
+        //long current = System.currentTimeMillis();
+        long zero = currentDate / (1000 * 24 * 3600) * (1000 * 24 * 3600) - TimeZone.getDefault().getRawOffset();
         if (checkTime >= zero + startTime * 60 * 1000 && checkTime <= zero + endTime * 60 * 1000) {
             return true;
         }
@@ -262,7 +262,7 @@ public class TeamServiceImpl implements TeamService {
             userTeam.setCreateTime(System.currentTimeMillis());
             UserTeam result = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
             if (result != null) {
-                return errMsg;
+                return "你已加入过该小组";
             }
             if (userTeamMapper.insert(userTeam) != 1) {
                 return errMsg;
@@ -411,7 +411,7 @@ public class TeamServiceImpl implements TeamService {
                     if(team.getActivityStatus()==TeamStatus.PROCCESSING) {
                         List<CheckRecord> checkRecordList = checkRecordMapper.findCheckRecordByUserTeamId(userTeam.getId());
                         for (CheckRecord checkRecord : checkRecordList) {
-                            if (todayCheckRecord(checkRecord.getCheckTime(), team.getStartTime(), team.getEndTime())) {
+                            if (todayCheckRecord(System.currentTimeMillis(), checkRecord.getCheckTime(), team.getStartTime(), team.getEndTime())) {
                                 teamDetailVo.setCheckRecordInfo(true);
                             }
                         }
@@ -421,6 +421,12 @@ public class TeamServiceImpl implements TeamService {
             }
         }
         return teamDetailVoList;
+    }
+
+    @Override
+    public List<CheckLog> getCheckLog(long teamId, int currentDay) {
+        List<CheckLog> logList=new ArrayList<>();
+        return logList;
     }
 
 
