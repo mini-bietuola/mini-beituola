@@ -166,7 +166,7 @@ public class TeamServiceImpl implements TeamService {
             if (current >= zero + startTime * 60 * 1000 && current <= zero + endTime * 60 * 1000) {
                 List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
                 if (checkRecordList.size() == 0) {
-                    checkRecordMapper.save(teamId, current);
+                    checkRecordMapper.save(userTeam.getId(), current);
                 }
                 String key = Constants.REDIS_CACHE_PREFIX+userId+"_"+teamId+"_"+DateUtil.getTodayStart();
                 redisService.delete(key);

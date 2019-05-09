@@ -38,6 +38,10 @@ public class SessionService {
         this.redisService = redisService;
     }
 
+    public void destoryThreadLocalSession() {
+        sessionThreadLocal.remove();
+    }
+
     /**
      * 创建用户会话，返回Session，其中包含token
      * @param user
