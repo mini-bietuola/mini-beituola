@@ -319,6 +319,16 @@ public class TeamServiceImpl implements TeamService {
                 teamVo.setTotlescore(totalScore);
                 teamVo.setAwardAmount(userTeamMapper.selectAwardAmountByUserIdTeamId(userId, teamId).toString());
             }
+            //招募中状态只查询小组成员信息
+            else{
+                List<User> userList = userMapper.getAllUserByTeamId(teamId);
+                List<CheckDetailVo> checkDetailVoList = new ArrayList<CheckDetailVo>();
+                for (User tempUser : userList) {
+                    int checkTime = checkRecordMapper.CountCheckTimeByUserId(tempUser.getId(), teamId);
+                    checkDetailVoList.add(new CheckDetailVo(tempUser, null, null));
+                }
+                teamVo.setCheckDetailList(checkDetailVoList);
+            }
 
             teamVo.setTeam(team);
             teamVo.setCurrentMemberNum(currentMemberNum);
