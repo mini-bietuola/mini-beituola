@@ -77,7 +77,7 @@ public class TeamServiceImpl implements TeamService {
         List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(userId);
         for (UserTeam userTeam : userTeamList) {
             for (Team team : teamList) {
-                if (userTeam.getTeamId() == team.getId()) {
+                if (Objects.equals(userTeam.getTeamId(), team.getId())) {
                     TeamDetailVo teamDetailVo = new TeamDetailVo();
                     teamDetailVo.setTeam(team);
                     teamDetailVo.setNumOfJoin(userTeamMapper.findTeamJoinNum(team.getId()));
@@ -85,7 +85,7 @@ public class TeamServiceImpl implements TeamService {
                 }
             }
             for (Team team : teamList1) {
-                if (userTeam.getTeamId() == team.getId()) {
+                if (Objects.equals(userTeam.getTeamId(), team.getId())) {
                     TeamDetailVo teamDetailVo = new TeamDetailVo();
                     teamDetailVo.setNumOfJoin(team.getMemberNum().longValue());
                     teamDetailVo.setTeam(team);
@@ -103,7 +103,7 @@ public class TeamServiceImpl implements TeamService {
         List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(userId);
         for (UserTeam userTeam : userTeamList) {
             for (Team team : teamList) {
-                if (userTeam.getTeamId() == team.getId()) {
+                if (Objects.equals(userTeam.getTeamId(), team.getId())) {
                     TeamDetailVo teamDetailVo = new TeamDetailVo();
                     teamDetailVo.setTeam(team);
                     teamDetailVo.setNumOfJoin(team.getMemberNum().longValue());
@@ -128,7 +128,7 @@ public class TeamServiceImpl implements TeamService {
         List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(userId);
         for (UserTeam userTeam : userTeamList) {
             for (Team team : teamList) {
-                if (userTeam.getTeamId() == team.getId()) {
+                if (Objects.equals(userTeam.getTeamId(), team.getId())) {
                     TeamDetailVo teamDetailVo = new TeamDetailVo();
                     teamDetailVo.setTeam(team);
                     teamDetailVo.setNumOfJoin(team.getMemberNum().longValue());
@@ -355,7 +355,7 @@ public class TeamServiceImpl implements TeamService {
     private TeamBaseInfoVo AssembleMyCheckInfo(TeamBaseInfoVo teamVo, Long userId){
         if(teamVo.getTeam().getActivityStatus() == TeamStatus.PROCCESSING || teamVo.getTeam().getActivityStatus() == TeamStatus.FINISHED) {
             for (CheckDetailVo tempCheckVo : teamVo.getCheckDetailList()) {
-                if (tempCheckVo.getUser().getId() == userId) {
+                if (Objects.equals(tempCheckVo.getUser().getId(), userId)) {
                     teamVo.setMyCheckTime(tempCheckVo.getCheckTime());
                     teamVo.setMyCheckscore(tempCheckVo.getScore());
                     break;
@@ -403,7 +403,7 @@ public class TeamServiceImpl implements TeamService {
         List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(sessionService.getCurrentUserId());
         for (UserTeam userTeam : userTeamList) {
             for (Team team : teamList) {
-                if (userTeam.getTeamId() == team.getId()) {
+                if (Objects.equals(userTeam.getTeamId(), team.getId())) {
                     TeamDetailVo teamDetailVo = new TeamDetailVo();
                     teamDetailVo.setTeam(team);
                     teamDetailVo.setNumOfJoin(team.getMemberNum().longValue());
