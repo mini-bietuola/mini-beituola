@@ -106,8 +106,15 @@ public interface TeamService {
     /**
      * 查询小组类别id
      *
-     * @param tcategoryId     小组类别ID
+     * @param categoryId     小组类别ID
      * @return
      */
     List<Team> getTeamByCategory(Long categoryId);
+
+
+
+
+
+
+
 }

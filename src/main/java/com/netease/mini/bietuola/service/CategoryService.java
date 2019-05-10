@@ -21,4 +21,14 @@ public interface CategoryService {
 //    boolean update(String name, long id);
 
     List<Category> listcategory();
+
+
+    /**
+     * 根据ID查询类别
+     *
+     * @param categoryId
+     * @return
+     */
+
+    List<Category> getCategory(Long categoryId);
 }

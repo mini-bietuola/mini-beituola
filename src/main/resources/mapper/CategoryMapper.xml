@@ -24,4 +24,10 @@
         SELECT id, name, img_url, score FROM category
     </select>
 
+
+    <select id="getCategory" parameterType="long" resultType="String">
+        SELECT name
+        FROM category
+        WHERE id= #{id}
+    </select>
 </mapper>

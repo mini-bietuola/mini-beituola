@@ -8,6 +8,7 @@ import com.netease.mini.bietuola.service.CategoryService;
 import com.netease.mini.bietuola.service.HelloService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,6 +28,14 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Category> listcategory() {
         return categoryMapper.listcategory() ;
     }
+
+    @Override
+    public List<Category> getCategory(Long categoryId) {
+        List<Category> categorys=new ArrayList<>();
+        categorys=categoryMapper.getCategory(categoryId);
+        return categorys;
+    }
+
 
 //    private final HelloMapper helloMapper;
 //

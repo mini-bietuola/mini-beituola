@@ -87,9 +87,10 @@ public class TeamController {
         }
         team.setDesc(desc);
         team.setActivityStatus(TeamStatus.RECUIT);
-        if(teamService.getTeamByCategory(categoryId)!=null) {
-            team.setCategoryId(categoryId);
+        if(categoryService.getCategory(categoryId).isEmpty()) {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("小组类型不存在");
         }
+        team.setCategoryId(categoryId);
         long time = System.currentTimeMillis();
         team.setCreateTime(time);
         team.setUpdateTime(time);

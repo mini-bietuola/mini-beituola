@@ -1,6 +1,7 @@
 package com.netease.mini.bietuola.mapper;
 
 import com.netease.mini.bietuola.constant.TeamStatus;
+import com.netease.mini.bietuola.entity.Category;
 import com.netease.mini.bietuola.entity.Team;
 import org.apache.ibatis.annotations.Param;
 
@@ -130,4 +131,7 @@ public interface TeamMapper {
      * @param current
      */
     void changeRecuitToFailForFullPeople(@Param("current") Long current);
+
+
+
 }
