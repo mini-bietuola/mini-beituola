@@ -61,7 +61,14 @@ public class TeamController {
             team.setAvatarUrl(default_img);
         }
         team.setImgUrl(imgUrl);
+        BigDecimal low=new BigDecimal(0);
+        if(fee.compareTo(low) < 0) {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("押金不能为负数");
+        }
         team.setFee(fee);
+        if(duration<0){
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("持续时间不能为负数");
+        }
         team.setDuration(duration);
         if (startTime < endTime) {
             Integer st = DateUtil.getCurDayMinutes(startTime);
@@ -78,20 +85,24 @@ public class TeamController {
         }
         team.setDesc(desc);
         team.setActivityStatus(TeamStatus.RECUIT);
-        team.setCategoryId(categoryId);
-        team.setStartType(startType);
-        if (team.getStartType() == StartType.SCHEDULE) {
-            team.setStartDate(startDate);
-        } else {
-            team.setMaxRecuitDate(maxRecuitDate);
+        if(teamService.getTeamByCategory(categoryId)==null) {
+            team.setCategoryId(categoryId);
         }
+        team.setStartType(startType);
         long time = System.currentTimeMillis();
         team.setCreateTime(time);
         team.setUpdateTime(time);
+        if (team.getStartType() == StartType.SCHEDULE) {
+            if(startDate>time){
+            team.setStartDate(startDate);
+            }
+        } else {
+            team.setMaxRecuitDate(maxRecuitDate);
+        }
         team.setCreateUserId(sessionService.getCurrentUserId());
         if (teamService.save(team)) {
             LOG.info("创建小组");
-            return JsonResponse.success();
+            return JsonResponse.success().setData(team.getId());
         }
         return JsonResponse.codeOf(ResultCode.BALANCE_NOT_ENOUGH).setMsg("押金不足");
     }

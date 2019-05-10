@@ -103,4 +103,11 @@ public interface TeamService {
      */
     List<CheckLog> getCheckLog(long teamId, int currentDay);
 
+    /**
+     * 查询小组类别id
+     *
+     * @param tcategoryId     小组类别ID
+     * @return
+     */
+    List<Team> getTeamByCategory(Long categoryId);
 }

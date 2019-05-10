@@ -440,5 +440,12 @@ public class TeamServiceImpl implements TeamService {
         return logList;
     }
 
+    @Override
+    public List<Team> getTeamByCategory(Long categoryId) {
+        List<Team> teams=new ArrayList<>();
+        teams=teamMapper.getTeamByCategory(categoryId);
+        return teams;
+    }
+
 
 }
