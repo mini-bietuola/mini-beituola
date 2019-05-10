@@ -29,4 +29,12 @@ public interface CategoryMapper {
      * @return
      */
     int selectScoreById(Long id);
+
+
+    /**
+     * 查询该类别对应的名字
+     * @param categoryId
+     * @return
+     */
+    List<Category> getCategory(Long categoryId);
 }

@@ -137,4 +137,7 @@
       WHERE activity_status = 1 AND start_type = 1 AND #{current} > (create_time+max_recuit_date*86400000)
     ]]>
     </update>
+
+
+
 </mapper>
