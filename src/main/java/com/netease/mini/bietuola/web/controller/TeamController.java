@@ -60,7 +60,9 @@ public class TeamController {
         } else {
             team.setAvatarUrl(default_img);
         }
-        team.setImgUrl(imgUrl);
+        if (HttpUtils.checkUrl(imgUrl)) {
+            team.setImgUrl(imgUrl);
+        }
         BigDecimal low=new BigDecimal(0);
         if(fee.compareTo(low) < 0) {
             return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("押金不能为负数");
@@ -81,14 +83,13 @@ public class TeamController {
         if (memberNum >= 2 && memberNum <= 100) {
             team.setMemberNum(memberNum);
         } else {
-            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("人数不符合要求");
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("人数不符合2到100要求");
         }
         team.setDesc(desc);
         team.setActivityStatus(TeamStatus.RECUIT);
         if(teamService.getTeamByCategory(categoryId)!=null) {
             team.setCategoryId(categoryId);
         }
-        team.setStartType(startType);
         long time = System.currentTimeMillis();
         team.setCreateTime(time);
         team.setUpdateTime(time);
@@ -97,6 +98,9 @@ public class TeamController {
             team.setStartDate(startDate);
             }
         } else {
+            if(maxRecuitDate<0){
+                return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("最大招募时间不能为负数");
+            }
             team.setMaxRecuitDate(maxRecuitDate);
         }
         team.setCreateUserId(sessionService.getCurrentUserId());
