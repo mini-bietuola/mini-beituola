@@ -93,7 +93,8 @@ public class TeamController {
         long time = System.currentTimeMillis();
         team.setCreateTime(time);
         team.setUpdateTime(time);
-        if (team.getStartType() == StartType.SCHEDULE) {
+        team.setStartType(startType);
+        if (startType == StartType.SCHEDULE) {
             if(startDate>time){
             team.setStartDate(startDate);
             }
