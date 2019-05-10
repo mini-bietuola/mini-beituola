@@ -3,6 +3,7 @@ package com.netease.mini.bietuola.web.controller;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.util.StringUtil;
+import com.netease.mini.bietuola.config.jpush.JPushService;
 import com.netease.mini.bietuola.config.redis.RedisService;
 import com.netease.mini.bietuola.config.session.SessionService;
 import com.netease.mini.bietuola.constant.StartType;
@@ -28,7 +29,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,12 +46,14 @@ public class TeamController {
     private final TeamService teamService;
     private final CategoryService categoryService;
     private final SessionService sessionService;
+    private final JPushService jPushService;
     static String default_img = "https://bietuola.nos-eastchina1.126.net/dcd36fc34be747fab44dec9ccea8d813.jpg";
 
-    public TeamController(TeamService teamService, CategoryService categoryService, SessionService sessionService) {
+    public TeamController(TeamService teamService, CategoryService categoryService, SessionService sessionService, JPushService jPushService) {
         this.teamService = teamService;
         this.categoryService = categoryService;
         this.sessionService = sessionService;
+        this.jPushService = jPushService;
     }
 
     @PostMapping
@@ -102,6 +107,8 @@ public class TeamController {
         team.setCreateUserId(sessionService.getCurrentUserId());
         if (teamService.save(team)) {
             LOG.info("创建小组");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            jPushService.SendTeamStartMessage("梦之队", sdf.format(new Date(System.currentTimeMillis() + 5 * 1000)));
             return JsonResponse.success().setData(team.getId());
         }
         return JsonResponse.codeOf(ResultCode.BALANCE_NOT_ENOUGH).setMsg("押金不足");
