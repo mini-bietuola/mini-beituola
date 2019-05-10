@@ -76,16 +76,16 @@ public class TeamController {
             team.setStartTime(st);
             team.setEndTime(ed);
         } else {
-            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("保存失败");
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("开始时间不能超过截止时间");
         }
         if (memberNum >= 2 && memberNum <= 100) {
             team.setMemberNum(memberNum);
         } else {
-            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("保存失败");
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("人数不符合要求");
         }
         team.setDesc(desc);
         team.setActivityStatus(TeamStatus.RECUIT);
-        if(teamService.getTeamByCategory(categoryId)==null) {
+        if(teamService.getTeamByCategory(categoryId)!=null) {
             team.setCategoryId(categoryId);
         }
         team.setStartType(startType);
