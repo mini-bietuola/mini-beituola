@@ -38,6 +38,7 @@ public class UserController {
 
     @PostMapping("/login")
     public JsonResponse login(String phone, String passwordMd5) {
+        // todo 手机号长度、数字格式等
         if (StringUtils.isAnyBlank(phone, passwordMd5)) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数格式错误");
         }
@@ -75,6 +76,7 @@ public class UserController {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数格式错误");
         }
         phone = phone.trim();
+        // todo 检查手机号是否已经注册
         verifyCode = verifyCode.trim();
         passwordMd5 = passwordMd5.toLowerCase();
         if (!captchaService.verifyAuthVerifyCode(phone, verifyCode)) {
@@ -121,6 +123,7 @@ public class UserController {
 
     @PostMapping("/update")
     public JsonResponse updateUserInfo(User user) {
+        // todo 一些属性检查，年龄上下限，nickname长度
         if (StringUtils.isAnyBlank(user.getNickname(), user.getAvatarUrl())) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数格式错误");
         }
