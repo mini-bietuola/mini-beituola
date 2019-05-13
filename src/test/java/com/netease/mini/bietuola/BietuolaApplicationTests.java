@@ -2,6 +2,7 @@ package com.netease.mini.bietuola;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.netease.mini.bietuola.config.redis.RedisService;
 import com.netease.mini.bietuola.constant.Role;
 import com.netease.mini.bietuola.constant.StartType;
 import com.netease.mini.bietuola.constant.TeamStatus;
@@ -34,6 +35,8 @@ public class BietuolaApplicationTests {
     private TeamMapper teamMapper;
     @Autowired
     private CategoryMapper categoryMapper;
+    @Autowired
+    private RedisService redisService;
 	@Test
 	public void contextLoads() {
         long l = System.currentTimeMillis();
@@ -114,6 +117,13 @@ public class BietuolaApplicationTests {
     @Test
     public void testlistcategort(){
 	    System.out.println(categoryMapper.listcategory());
+    }
+
+    @Test
+    public void testReidsExpire() {
+	    // set 覆盖会把过期时间也覆盖掉
+//        redisService.set("test:key1", "val", 100);
+        redisService.set("test:key1", "val2");
     }
 
 }

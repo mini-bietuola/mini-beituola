@@ -72,4 +72,9 @@ public class UserServiceImpl implements UserService {
         int i = userMapper.updateBaseInfoById(user);
         return i > 0;
     }
+
+    @Override
+    public User getById(Long id) {
+        return userMapper.findUserByUserId(id);
+    }
 }

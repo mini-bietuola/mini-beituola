@@ -19,4 +19,6 @@ public interface UserService {
     User getBaseInfoById(Long uid);
 
     boolean updateBaseInfo(User user);
+
+    User getById(Long currentUserId);
 }
