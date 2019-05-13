@@ -9,6 +9,7 @@ import com.netease.mini.bietuola.constant.Constants;
 import com.netease.mini.bietuola.constant.StartType;
 import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.*;
+import com.netease.mini.bietuola.exception.ServiceException;
 import com.netease.mini.bietuola.mapper.*;
 import com.netease.mini.bietuola.service.TeamService;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
@@ -156,6 +157,9 @@ public class TeamServiceImpl implements TeamService {
     public boolean checkRecord(Long userId, Long teamId) {
         Team team = teamMapper.findTeamByTeamId(teamId);
         UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
+        if(userTeam==null){
+            throw new ServiceException("当前用户："+userId+"未参与小组："+teamId);
+        }
         Integer startTime = team.getStartTime();
         Integer endTime = team.getEndTime();
         Long startDay = team.getStartDate();
@@ -186,6 +190,9 @@ public class TeamServiceImpl implements TeamService {
             return (boolean)redisService.get(key);
         }else {
             UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
+            if(userTeam==null){
+                throw new ServiceException("当前用户："+userId+"未参与小组："+teamId);
+            }
             List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
             if (checkRecordList.size() == 0) {
                 redisService.set(key,false);

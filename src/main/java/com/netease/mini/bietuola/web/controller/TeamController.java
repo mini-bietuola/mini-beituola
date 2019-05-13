@@ -12,6 +12,7 @@ import com.netease.mini.bietuola.entity.Category;
 import com.netease.mini.bietuola.entity.RecomTeamInfo;
 import com.netease.mini.bietuola.entity.RecomTeamResult;
 import com.netease.mini.bietuola.entity.Team;
+import com.netease.mini.bietuola.exception.ServiceException;
 import com.netease.mini.bietuola.service.CategoryService;
 import com.netease.mini.bietuola.service.TeamService;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
@@ -157,19 +158,27 @@ public class TeamController {
     @RequestMapping("/checkRecord")
     public JsonResponse checkRecord(Long teamId) {
         Long userid = sessionService.getCurrentUserId();
-        if (teamService.checkRecord(userid, teamId)) {
-            return JsonResponse.success().setMsg("打卡成功");
+        try {
+            if (teamService.checkRecord(userid, teamId)) {
+                return JsonResponse.success().setMsg("打卡成功");
+            }
+            return JsonResponse.codeOf(ResultCode.ERROR_CHECK_RECORD_FAIL).setMsg("打卡失败");
+        }catch (ServiceException e){
+            return JsonResponse.codeOf(ResultCode.ERROR_EXCEPTION_GLOBAL).setMsg(e.getMessage());
         }
-        return JsonResponse.codeOf(ResultCode.ERROR_CHECK_RECORD_FAIL).setMsg("打卡失败");
     }
 
     @RequestMapping("/queryTodayCheckStatus")
     public JsonResponse queryTodayCheckStatus(Long teamId) {
         Long userid = sessionService.getCurrentUserId();
-        if (teamService.queryTodayCheckStatus(userid, teamId)) {
-            return JsonResponse.success().setMsg("今日已打卡").setData(true);
+        try {
+            if (teamService.queryTodayCheckStatus(userid, teamId)) {
+                return JsonResponse.success().setMsg("今日已打卡").setData(true);
+            }
+            return JsonResponse.success().setMsg("今日未打卡").setData(false);
+        }catch (ServiceException e){
+            return JsonResponse.codeOf(ResultCode.ERROR_EXCEPTION_GLOBAL).setMsg(e.getMessage());
         }
-        return JsonResponse.success().setMsg("今日未打卡").setData(false);
     }
 
     /**
