@@ -131,4 +131,8 @@ public class DateUtil {
         int minutes = date.getMinutes();
         return hours * 60 + minutes;
     }
+
+    public static int getBetweenDays(long startTime, long endTime){
+        return (int)((endTime-startTime)/DateUtils.MILLIS_PER_DAY);
+    }
 }

@@ -3,6 +3,7 @@ package com.netease.mini.bietuola.service;
 import com.netease.mini.bietuola.constant.TeamStatus;
 import com.netease.mini.bietuola.entity.*;
 import com.netease.mini.bietuola.vo.TeamDetailVo;
+import com.netease.mini.bietuola.web.util.DateUtil;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 
 import java.util.List;
@@ -73,7 +74,7 @@ public interface TeamService {
      * @param teamId
      * @return
      */
-    boolean queryTodayCheckStatus(Long userId, Long teamId);
+    boolean queryTodayCheckStatus(Long userId, Long teamId, long time);
 
     JsonResponse getBaseInfo(Long teamId, Long userId);
 
@@ -97,24 +98,18 @@ public interface TeamService {
     /**
      * 查询小组成员打卡历史
      *
-     * @param teamId     小组ID
-     * @param currentDay 当前第几天
+     * @param teamId 小组ID
      * @return
      */
-    List<CheckLog> getCheckLog(long teamId, int currentDay);
+    List<DateCheck> getCheckLog(long teamId);
 
     /**
      * 查询小组类别id
      *
-     * @param categoryId     小组类别ID
+     * @param categoryId 小组类别ID
      * @return
      */
     List<Team> getTeamByCategory(Long categoryId);
-
-
-
-
-
 
 
 }

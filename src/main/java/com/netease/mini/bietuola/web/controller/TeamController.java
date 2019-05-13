@@ -69,12 +69,12 @@ public class TeamController {
         if (HttpUtils.checkUrl(imgUrl)) {
             team.setImgUrl(imgUrl);
         }
-        BigDecimal low=new BigDecimal(0);
-        if(fee.compareTo(low) < 0) {
+        BigDecimal low = new BigDecimal(0);
+        if (fee.compareTo(low) < 0) {
             return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("押金不能为负数");
         }
         team.setFee(fee);
-        if(duration<0){
+        if (duration < 0) {
             return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("持续时间不能为负数");
         }
         team.setDuration(duration);
@@ -93,7 +93,7 @@ public class TeamController {
         }
         team.setDesc(desc);
         team.setActivityStatus(TeamStatus.RECUIT);
-        if(categoryService.getCategory(categoryId).isEmpty()) {
+        if (categoryService.getCategory(categoryId).isEmpty()) {
             return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("小组类型不存在");
         }
         team.setCategoryId(categoryId);
@@ -102,11 +102,11 @@ public class TeamController {
         team.setUpdateTime(time);
         team.setStartType(startType);
         if (startType == StartType.SCHEDULE) {
-            if(startDate>time){
-            team.setStartDate(startDate);
+            if (startDate > time) {
+                team.setStartDate(startDate);
             }
         } else {
-            if(maxRecuitDate<0){
+            if (maxRecuitDate < 0) {
                 return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("最大招募时间不能为负数");
             }
             team.setMaxRecuitDate(maxRecuitDate);
@@ -172,7 +172,7 @@ public class TeamController {
     public JsonResponse queryTodayCheckStatus(Long teamId) {
         Long userid = sessionService.getCurrentUserId();
         try {
-            if (teamService.queryTodayCheckStatus(userid, teamId)) {
+            if (teamService.queryTodayCheckStatus(userid, teamId,DateUtil.getTodayStart())) {
                 return JsonResponse.success().setMsg("今日已打卡").setData(true);
             }
             return JsonResponse.success().setMsg("今日未打卡").setData(false);
@@ -262,16 +262,15 @@ public class TeamController {
     /**
      * 查询小组成员打卡历史
      *
-     * @param teamId     小组ID
-     * @param currentDay 当前第几天
+     * @param teamId 小组ID
      * @return
      */
     @RequestMapping("/check-log")
-    public JsonResponse getCheckLog(long teamId, int currentDay) {
-        if (teamId <= 0 || currentDay <= 0) {
+    public JsonResponse getCheckLog(long teamId) {
+        if (teamId <= 0) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数错误");
         }
-        return JsonResponse.success(teamService.getCheckLog(teamId, currentDay));
+        return JsonResponse.success(teamService.getCheckLog(teamId));
     }
 
 }
