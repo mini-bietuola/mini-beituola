@@ -41,8 +41,17 @@
         group by ut.user_id
     </select>
 
+    <select id="getCheckTime" resultType="Long">
+        <![CDATA[SELECT check_time
+        FROM user_team,check_record
+        WHERE user_team.id=check_record.user_team_id
+        AND user_id=#{userId}
+        AND team_id=#{teamId}
+        AND check_time>=#{startTime} AND check_time<=#{endTime}]]>
+    </select>
+
     <resultMap id="checkTimeMap" type="map">
-        <result column="user_id" property="userId" javaType="long"  />
+        <result column="user_id" property="userId" javaType="Long"  />
         <result column="times" property="times" javaType="long" />
     </resultMap>
 

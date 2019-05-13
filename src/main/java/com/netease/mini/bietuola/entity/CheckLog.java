@@ -33,7 +33,7 @@ public class CheckLog {
     /**
      * 打卡时间
      */
-    private String checkTime;
+    private long checkTime;
 
     public long getUserId() {
         return userId;
@@ -67,11 +67,11 @@ public class CheckLog {
         this.checkStatus = checkStatus;
     }
 
-    public String getCheckTime() {
+    public long getCheckTime() {
         return checkTime;
     }
 
-    public void setCheckTime(String checkTime) {
+    public void setCheckTime(long checkTime) {
         this.checkTime = checkTime;
     }
 }

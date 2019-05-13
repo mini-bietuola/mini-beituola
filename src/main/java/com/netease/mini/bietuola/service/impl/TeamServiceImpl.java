@@ -16,6 +16,7 @@ import com.netease.mini.bietuola.web.util.DateUtil;
 import com.netease.mini.bietuola.web.util.JsonResponse;
 import com.netease.mini.bietuola.web.vo.CheckDetailVo;
 import com.netease.mini.bietuola.web.vo.TeamBaseInfoVo;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.tomcat.util.bcel.Const;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -162,13 +163,13 @@ public class TeamServiceImpl implements TeamService {
         Integer days = team.getDuration();
         long current = System.currentTimeMillis();
         long zero = current / (1000 * 24 * 3600) * (1000 * 24 * 3600) - TimeZone.getDefault().getRawOffset();
-        if(current>=startDay&&current<=startDay+days*24*60*60*1000){
+        if (current >= startDay && current <= startDay + days * 24 * 60 * 60 * 1000) {
             if (current >= zero + startTime * 60 * 1000 && current <= zero + endTime * 60 * 1000) {
                 List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
                 if (checkRecordList.size() == 0) {
                     checkRecordMapper.save(userTeam.getId(), current);
                 }
-                String key = Constants.REDIS_CACHE_PREFIX+userId+"_"+teamId+"_"+DateUtil.getTodayStart();
+                String key = Constants.REDIS_CACHE_PREFIX + userId + "_" + teamId + "_" + DateUtil.getTodayStart();
                 redisService.delete(key);
 
                 //删除进行中小组详情的缓存
@@ -180,18 +181,18 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public boolean queryTodayCheckStatus(Long userId, Long teamId) {
-        String key = Constants.REDIS_CACHE_PREFIX+userId+"_"+teamId+"_"+DateUtil.getTodayStart();
-        if(redisService.get(key)!=null){
-            return (boolean)redisService.get(key);
-        }else {
+    public boolean queryTodayCheckStatus(Long userId, Long teamId, long currentDate) {
+        String key = Constants.REDIS_CACHE_PREFIX + userId + "_" + teamId + "_" + currentDate;
+        if (redisService.get(key) != null) {
+            return (boolean) redisService.get(key);
+        } else {
             UserTeam userTeam = userTeamMapper.findUserTeamByUserIdAndTeamId(userId, teamId);
-            List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), DateUtil.getTodayStart(), DateUtil.getTodayEnd());
+            List<CheckRecord> checkRecordList = checkRecordMapper.CheckStatus(userTeam.getId(), currentDate, currentDate + DateUtils.MILLIS_PER_DAY);
             if (checkRecordList.size() == 0) {
-                redisService.set(key,false);
+                redisService.set(key, false);
                 return false;
             }
-            redisService.set(key,true);
+            redisService.set(key, true);
             return true;
         }
     }
@@ -205,7 +206,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public RecomTeamResult getRecomTeam(Long categoryId, int pageNumber, int pageSize) {
-        RecomTeamResult recomTeamResult=new RecomTeamResult();
+        RecomTeamResult recomTeamResult = new RecomTeamResult();
         List<RecomTeamInfo> recomTeamInfos = new ArrayList<>();
         PageHelper.startPage(pageNumber, pageSize);
         List<Team> teams = new ArrayList<>();
@@ -217,7 +218,7 @@ public class TeamServiceImpl implements TeamService {
         if (CollectionUtils.isEmpty(teams)) {
             return null;
         }
-        PageInfo<Team> pageInfo=new PageInfo<>(teams);
+        PageInfo<Team> pageInfo = new PageInfo<>(teams);
         recomTeamResult.setPageNumber(pageInfo.getPageNum());
         recomTeamResult.setPageSize(pageInfo.getPageSize());
         recomTeamResult.setHasPreviousPage(pageInfo.isHasPreviousPage());
@@ -248,7 +249,7 @@ public class TeamServiceImpl implements TeamService {
         long userId = sessionService.getCurrentUserId();
         String key = Constants.REDIS_LOCK_PREFIX + teamId;
         RedisLock lock = redisService.getLock(key);
-        String errMsg="加入失败";
+        String errMsg = "加入失败";
         boolean isLocked = lock.tryLock(10, 10);
         if (!isLocked) {
             return errMsg;
@@ -265,8 +266,8 @@ public class TeamServiceImpl implements TeamService {
             BigDecimal fee = team.getFee();
             BigDecimal amount = userMapper.getAmount(userId);
             if (amount.compareTo(fee) < 0) {
-                    return "余额不足，请充值";
-                }
+                return "余额不足，请充值";
+            }
             UserTeam userTeam = new UserTeam();
             userTeam.setUserId(userId);
             userTeam.setTeamId(teamId);
@@ -286,7 +287,7 @@ public class TeamServiceImpl implements TeamService {
                 long startDate = team.getStartType() == StartType.FULL_PEOPLE ? DateUtil.getDayZeroTime(DateUtil.getTimeOffsetDays(System.currentTimeMillis(), 1)) : team.getStartDate();
                 teamMapper.updateStatus(startDate, TeamStatus.WAITING_START, teamId);
             }
-            redisService.delete(Constants.TEAM_DETAIL_PREFIX+teamId);
+            redisService.delete(Constants.TEAM_DETAIL_PREFIX + teamId);
             return "";
         } finally {
             lock.unlock();
@@ -311,7 +312,7 @@ public class TeamServiceImpl implements TeamService {
                 currentMemberNum = teamMapper.countCurrentMemberNum(teamId);
             }
             //进行中和结束状态需要查询小组成员打卡信息
-            if(team.getActivityStatus() == TeamStatus.PROCCESSING || team.getActivityStatus() == TeamStatus.FINISHED){
+            if (team.getActivityStatus() == TeamStatus.PROCCESSING || team.getActivityStatus() == TeamStatus.FINISHED) {
                 List<User> userList = userMapper.getAllUserByTeamId(teamId);
                 List<CheckDetailVo> checkDetailVoList = new ArrayList<CheckDetailVo>();
 
@@ -332,7 +333,7 @@ public class TeamServiceImpl implements TeamService {
                 teamVo.setAwardAmount(userTeamMapper.selectAwardAmountByUserIdTeamId(userId, teamId).toString());
             }
             //招募中状态只查询小组成员信息
-            else{
+            else {
                 List<User> userList = userMapper.getAllUserByTeamId(teamId);
                 List<CheckDetailVo> checkDetailVoList = new ArrayList<CheckDetailVo>();
                 for (User tempUser : userList) {
@@ -364,8 +365,8 @@ public class TeamServiceImpl implements TeamService {
     }
 
     //装配个人打卡次数和个人打卡积分
-    private TeamBaseInfoVo AssembleMyCheckInfo(TeamBaseInfoVo teamVo, Long userId){
-        if(teamVo.getTeam().getActivityStatus() == TeamStatus.PROCCESSING || teamVo.getTeam().getActivityStatus() == TeamStatus.FINISHED) {
+    private TeamBaseInfoVo AssembleMyCheckInfo(TeamBaseInfoVo teamVo, Long userId) {
+        if (teamVo.getTeam().getActivityStatus() == TeamStatus.PROCCESSING || teamVo.getTeam().getActivityStatus() == TeamStatus.FINISHED) {
             for (CheckDetailVo tempCheckVo : teamVo.getCheckDetailList()) {
                 if (Objects.equals(tempCheckVo.getUser().getId(), userId)) {
                     teamVo.setMyCheckTime(tempCheckVo.getCheckTime());
@@ -381,7 +382,7 @@ public class TeamServiceImpl implements TeamService {
     public List<RecomTeamInfo> searchTeam(String name) {
         List<RecomTeamInfo> recomTeamInfos = new ArrayList<>();
         List<Team> teamList = new ArrayList<>();
-        teamList=teamMapper.getTeamByName(name);
+        teamList = teamMapper.getTeamByName(name);
         if (CollectionUtils.isEmpty(teamList)) {
             return recomTeamInfos;
         }
@@ -405,13 +406,13 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public List<TeamDetailVo> findTeam(TeamStatus teamStatus, String name) {
-        List<TeamDetailVo> teamDetailVoList=new ArrayList<>();
-        List<TeamStatus> statusList=new ArrayList<>();
+        List<TeamDetailVo> teamDetailVoList = new ArrayList<>();
+        List<TeamStatus> statusList = new ArrayList<>();
         statusList.add(teamStatus);
-        if(teamStatus==TeamStatus.RECUIT){
+        if (teamStatus == TeamStatus.RECUIT) {
             statusList.add(TeamStatus.WAITING_START);
         }
-        List<Team> teamList=teamMapper.findTeamByStatusList(statusList,name);
+        List<Team> teamList = teamMapper.findTeamByStatusList(statusList, name);
         List<UserTeam> userTeamList = userTeamMapper.findUserTeamByUserId(sessionService.getCurrentUserId());
         for (UserTeam userTeam : userTeamList) {
             for (Team team : teamList) {
@@ -419,7 +420,7 @@ public class TeamServiceImpl implements TeamService {
                     TeamDetailVo teamDetailVo = new TeamDetailVo();
                     teamDetailVo.setTeam(team);
                     teamDetailVo.setNumOfJoin(team.getMemberNum().longValue());
-                    if(team.getActivityStatus()==TeamStatus.PROCCESSING) {
+                    if (team.getActivityStatus() == TeamStatus.PROCCESSING) {
                         List<CheckRecord> checkRecordList = checkRecordMapper.findCheckRecordByUserTeamId(userTeam.getId());
                         for (CheckRecord checkRecord : checkRecordList) {
                             if (todayCheckRecord(System.currentTimeMillis(), checkRecord.getCheckTime(), team.getStartTime(), team.getEndTime())) {
@@ -435,18 +436,48 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<CheckLog> getCheckLog(long teamId, int currentDay) {
-        List<CheckLog> logList=new ArrayList<>();
-        return logList;
+    public List<DateCheck> getCheckLog(long teamId) {
+        List<DateCheck> dateCheckList = new ArrayList<>();
+        Team team = teamMapper.getTeamById(teamId);
+        if (team == null || System.currentTimeMillis() < team.getStartDate()) {
+            return dateCheckList;
+        }
+        List<User> userList = userMapper.getAllUserByTeamId(teamId);
+        if (CollectionUtils.isEmpty(userList)) {
+            return dateCheckList;
+        }
+        long endTime = team.getStartDate() + team.getDuration() * DateUtils.MILLIS_PER_DAY;
+        long currentDay = System.currentTimeMillis() > endTime ? endTime : DateUtil.getDayZeroTime(System.currentTimeMillis());
+        int betweenDays = DateUtil.getBetweenDays(team.getStartDate(), currentDay);
+        for (int i = 0; i <= betweenDays; i++) {
+            DateCheck dateCheck = new DateCheck();
+            long date = DateUtil.getTimeOffsetDays(team.getStartDate(), i);
+            dateCheck.setCurretDate(date);
+            List<CheckLog> checkLogs = new ArrayList<>();
+            for (User user : userList) {
+                CheckLog checkLog = new CheckLog();
+                checkLog.setUserId(user.getId());
+                checkLog.setUserName(user.getNickname());
+                checkLog.setAvatarUrl(user.getAvatarUrl());
+                checkLog.setCheckStatus(queryTodayCheckStatus(user.getId(), teamId, date));
+                Long checkTime = checkRecordMapper.getCheckTime(user.getId(), teamId, date, date + DateUtils.MILLIS_PER_DAY);
+                if (checkTime!=null) {
+                    checkLog.setCheckTime(checkTime);
+                }
+                checkLogs.add(checkLog);
+            }
+            dateCheck.setCheckLogList(checkLogs);
+            dateCheckList.add(dateCheck);
+        }
+        return dateCheckList;
     }
 
     @Override
     public List<Team> getTeamByCategory(Long categoryId) {
-        List<Team> teams=new ArrayList<>();
-        teams=teamMapper.getTeamByCategory(categoryId);
+        List<Team> teams = new ArrayList<>();
+        teams = teamMapper.getTeamByCategory(categoryId);
         return teams;
     }
-
 
 
 }
