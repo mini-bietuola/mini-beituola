@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
         user.setUpdateTime(time);
         user.setScore(0L);
         user.setAvatarUrl(DEFAULT_USER_AVATAR_URL);
-        user.setAmount(new BigDecimal("0.00"));
+        user.setAmount(new BigDecimal("1000.00"));
         int i = userMapper.save(user);
         return i == 1 ? user : null;
     }
