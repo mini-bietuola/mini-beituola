@@ -6,8 +6,10 @@ import com.netease.mini.bietuola.config.session.SessionService;
 import com.netease.mini.bietuola.entity.User;
 import com.netease.mini.bietuola.service.UserService;
 import com.netease.mini.bietuola.web.util.JsonResponse;
+import com.netease.mini.bietuola.web.util.ParamUtils;
 import com.netease.mini.bietuola.web.util.ResultCode;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,11 +40,10 @@ public class UserController {
 
     @PostMapping("/login")
     public JsonResponse login(String phone, String passwordMd5) {
-        // todo 手机号长度、数字格式等
-        if (StringUtils.isAnyBlank(phone, passwordMd5)) {
+        if (!ParamUtils.checkPhone(phone) || !ParamUtils.checkPasswordMd5(passwordMd5)) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数格式错误");
         }
-        User user = userService.getByPhone(phone.trim());
+        User user = userService.getByPhone(phone);
         if (user == null || !passwordMd5.trim().equalsIgnoreCase(user.getPasswordMd5())) {
             return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("用户名或密码错误");
         }
@@ -53,7 +54,7 @@ public class UserController {
 
     @GetMapping("/check-phone-registered")
     public JsonResponse checkPhoneRegistered(String phone) {
-        if (StringUtils.isBlank(phone)) {
+        if (!ParamUtils.checkPhone(phone)) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数格式错误");
         }
         return userService.checkPhoneRegistered(phone) ? JsonResponse.success()
@@ -62,7 +63,7 @@ public class UserController {
 
     @PostMapping("/authcode")
     public JsonResponse sendPhoneAuthVerifyCode(String phone) {
-        if (StringUtils.isBlank(phone)) {
+        if (!ParamUtils.checkPhone(phone)) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数格式错误");
         }
         return captchaService.sendAuthVerifyCode(phone.trim()) ? JsonResponse.success()
@@ -71,14 +72,14 @@ public class UserController {
 
     @PostMapping("/register")
     public JsonResponse userRegister(String phone, String passwordMd5, String verifyCode) {
-        if(StringUtils.isAnyBlank(phone, passwordMd5, verifyCode) ||
-                (passwordMd5 = passwordMd5.trim()).length() != 32){
+        if (!ParamUtils.checkPhone(phone) || !ParamUtils.checkPasswordMd5(passwordMd5)
+                || StringUtils.isBlank(verifyCode)) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数格式错误");
         }
-        phone = phone.trim();
-        // todo 检查手机号是否已经注册
+        if (userService.checkPhoneRegistered(phone)) {
+            return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("手机号码已注册");
+        }
         verifyCode = verifyCode.trim();
-        passwordMd5 = passwordMd5.toLowerCase();
         if (!captchaService.verifyAuthVerifyCode(phone, verifyCode)) {
             return JsonResponse.codeOf(ResultCode.VERIFY_CODE_FAIL).setMsg("验证码校验失败");
         }
@@ -92,13 +93,14 @@ public class UserController {
 
     @PostMapping("/reset-password")
     public JsonResponse resetPassword(String phone, String passwordMd5, String verifyCode) {
-        if(StringUtils.isAnyBlank(phone, passwordMd5, verifyCode) ||
-                (passwordMd5 = passwordMd5.trim()).length() != 32){
+        if(!ParamUtils.checkPhone(phone) || !ParamUtils.checkPasswordMd5(passwordMd5)
+                || StringUtils.isBlank(verifyCode)){
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数格式错误");
         }
-        phone = phone.trim();
+        if (!userService.checkPhoneRegistered(phone)) {
+            return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("手机号码未注册");
+        }
         verifyCode = verifyCode.trim();
-        passwordMd5 = passwordMd5.toLowerCase();
         if (!captchaService.verifyAuthVerifyCode(phone, verifyCode)) {
             return JsonResponse.codeOf(ResultCode.VERIFY_CODE_FAIL).setMsg("验证码校验失败");
         }
@@ -123,14 +125,18 @@ public class UserController {
 
     @PostMapping("/update")
     public JsonResponse updateUserInfo(User user) {
-        // todo 一些属性检查，年龄上下限，nickname长度
-        if (StringUtils.isAnyBlank(user.getNickname(), user.getAvatarUrl())) {
+        if (!ParamUtils.checkUserProperties(user)) {
             return JsonResponse.codeOf(ResultCode.ERROR_BAD_PARAMETER).setMsg("参数格式错误");
         }
         Long currentUserId = sessionService.getCurrentUserId();
         user.setId(currentUserId);
-        return userService.updateBaseInfo(user) ? JsonResponse.success()
-                : JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("用户信息更新失败");
+        boolean success = userService.updateBaseInfo(user);
+        if (!success) {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("用户信息更新失败");
+        }
+        User newUser = userService.getById(currentUserId);
+        sessionService.refreshSessionUserInfo(newUser);
+        return JsonResponse.success();
     }
 
 }
