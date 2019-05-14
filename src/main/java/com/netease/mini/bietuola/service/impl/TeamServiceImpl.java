@@ -179,9 +179,12 @@ public class TeamServiceImpl implements TeamService {
                 //删除进行中小组详情的缓存
                 redisService.delete(Constants.TEAM_DETAIL_PREFIX + teamId);
                 return true;
+            }else {
+                throw new ServiceException("当前不在打卡时间段内");
             }
+        }else {
+            throw new ServiceException("当前不在打卡时间段内");
         }
-        return false;
     }
 
     @Override
