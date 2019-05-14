@@ -106,11 +106,7 @@ public class SessionService {
      * @return
      */
     public User getCurrentUser() {
-        String token = getRequest().getHeader("token");
-        if (StringUtils.isBlank(token)) {
-            return null;
-        }
-        Session session = getSession(token);
+        Session session = getCurrentSession();
         return session == null ? null : session.getUser();
     }
 
@@ -129,6 +125,23 @@ public class SessionService {
 
     public HttpServletResponse getResponse() {
         return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+    }
+
+    public Session getCurrentSession() {
+        String token = getRequest().getHeader("token");
+        if (StringUtils.isBlank(token)) {
+            return null;
+        }
+        return getSession(token);
+    }
+
+    public void refreshSessionUserInfo(User user) {
+        Session session = getCurrentSession();
+        session.setUser(user);
+        user.setPasswordMd5(null);
+        String token = session.getToken();
+        String key = SESSION_KEY_PREFIX + token;
+        redisService.set(key, session, SESSION_TIMEOUT_SECOND);
     }
 
 }

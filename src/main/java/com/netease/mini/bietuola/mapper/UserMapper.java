@@ -21,7 +21,7 @@ public interface UserMapper {
      * @param userId 用户id
      * @return
      */
-    User findUserByUserId(int userId);
+    User findUserByUserId(Long userId);
 
 
     /**

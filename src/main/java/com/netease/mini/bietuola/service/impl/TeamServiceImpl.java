@@ -340,7 +340,9 @@ public class TeamServiceImpl implements TeamService {
                 teamVo.setMyCheckTime(myCheckTime);
                 teamVo.setMyCheckscore(myScore);
                 teamVo.setTotlescore(totalScore);
-                teamVo.setAwardAmount(userTeamMapper.selectAwardAmountByUserIdTeamId(userId, teamId).toString());
+                if (team.getActivityStatus() == TeamStatus.FINISHED) {
+                    teamVo.setAwardAmount(userTeamMapper.selectAwardAmountByUserIdTeamId(userId, teamId).toString());
+                }
             }
             //招募中状态只查询小组成员信息
             else {

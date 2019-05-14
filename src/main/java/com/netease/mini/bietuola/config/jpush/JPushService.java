@@ -4,7 +4,6 @@ import cn.jiguang.common.ClientConfig;
 import cn.jiguang.common.resp.APIConnectionException;
 import cn.jiguang.common.resp.APIRequestException;
 import cn.jpush.api.JPushClient;
-import cn.jpush.api.push.PushResult;
 import cn.jpush.api.push.model.Platform;
 import cn.jpush.api.push.model.PushPayload;
 import cn.jpush.api.push.model.audience.Audience;
@@ -14,10 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-
+import java.util.Map;
 /**
  * @Description 极光推送服务
  * @Author ttw
@@ -32,24 +28,21 @@ public class JPushService {
     ClientConfig clientConfig = ClientConfig.getInstance();
     final JPushClient jpushClient = new JPushClient(masterSecret, appKey, null, clientConfig);
 
-    public static PushPayload buildPushObject_android_tag_alertWithTitle(String alert, String title) {
+    public static PushPayload buildPushObject_android_tag_alertWithTitle(String alert, String title, Map map, String... tags) {
         return PushPayload.newBuilder()
                 .setPlatform(Platform.android())
-                .setAudience(Audience.tag("team"))
-                .setNotification(Notification.android(alert, title, null))
+                .setAudience(Audience.tag(tags))
+                .setNotification(Notification.android(alert, title, map))
                 .build();
     }
 
-
-    public void SendCheckMessage(String teamName, String startTime, String endTime, String sendTime, String checkTime){
-        final PushPayload payload = buildPushObject_android_tag_alertWithTitle("您的小组" + teamName + "打卡时间为" + checkTime, "打卡时间马上就要到啦~不要忘记打卡噢");
+    //发送一次消息
+    public void sendSingleNotification(String alert, String title, String sendTime, String name, Map map, String... tags){
+        final PushPayload payload = buildPushObject_android_tag_alertWithTitle(alert, title, map ,tags);
 
         try {
-            //PushResult result = jpushClient.sendPush(payload);
-            ScheduleResult result = jpushClient.createDailySchedule("打卡提醒", startTime, endTime, sendTime, 1, payload);
+            ScheduleResult result = jpushClient.createSingleSchedule(name, sendTime, payload);
             LOG.info("Got result - " + result);
-
-
         } catch (APIConnectionException e) {
             LOG.error("Connection error. Should retry later. ", e);
             LOG.error("Sendno: " + payload.getSendno());
@@ -64,15 +57,15 @@ public class JPushService {
         }
     }
 
-    public void SendTeamStartMessage(String teamName, String sendTime){
-        final PushPayload payload = buildPushObject_android_tag_alertWithTitle("您的小组\"" + teamName + "\"明天就要开始打卡啦~", "小组开始");
+    //发送每天一次的消息，频率可以改变。
+    //startTime、endTime format 为 'yyyy-MM-dd HH:mm:ss'
+    //sendTime format为 'HH:mm:ss'
+    public void sendDailyNotification(String alert, String title, String sendTime, String startTime, String endTime, String name, Integer frequency,  Map map, String... tags) {
+        final PushPayload payload = buildPushObject_android_tag_alertWithTitle(alert, title, map ,tags);
 
         try {
-            //PushResult result = jpushClient.sendPush(payload);
-            ScheduleResult result = jpushClient.createSingleSchedule("小队开始提醒", sendTime, payload);
+            ScheduleResult result = jpushClient.createDailySchedule(name, startTime, endTime, sendTime, frequency, payload);
             LOG.info("Got result - " + result);
-
-
         } catch (APIConnectionException e) {
             LOG.error("Connection error. Should retry later. ", e);
             LOG.error("Sendno: " + payload.getSendno());
@@ -87,10 +80,10 @@ public class JPushService {
         }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         JPushService jPushService = new JPushService();
         jPushService.SendTeamStartMessage("梦之队", sdf.format(new Date(System.currentTimeMillis() + 5 * 1000)));
-    }
+    }*/
 
 }
