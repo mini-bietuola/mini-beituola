@@ -114,8 +114,6 @@ public class TeamController {
         team.setCreateUserId(sessionService.getCurrentUserId());
         if (teamService.save(team)) {
             LOG.info("创建小组");
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            jPushService.SendTeamStartMessage("梦之队", sdf.format(new Date(System.currentTimeMillis() + 5 * 1000)));
             return JsonResponse.success().setData(team.getId());
         }
         return JsonResponse.codeOf(ResultCode.BALANCE_NOT_ENOUGH).setMsg("押金不足");
