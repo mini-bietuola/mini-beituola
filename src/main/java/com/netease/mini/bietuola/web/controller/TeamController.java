@@ -60,7 +60,15 @@ public class TeamController {
     @PostMapping
     public JsonResponse create(String name, String avatarUrl, String imgUrl, BigDecimal fee, Long startDate, Integer duration, Long startTime, Long endTime, Integer memberNum, String desc, Long categoryId, StartType startType, Long maxRecuitDate) {
         Team team = new Team();
-        team.setName(name);
+        if (StringUtils.trim(name)==null) {
+            return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("小组名不能为空");
+        } else {
+            if (StringUtils.isBlank(name)) {
+                return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("小组名不能为特殊字符");
+            } else {
+                team.setName(name);
+            }
+        }
         if (HttpUtils.checkUrl(avatarUrl)) {
             team.setAvatarUrl(avatarUrl);
         } else {
@@ -105,10 +113,12 @@ public class TeamController {
             if (startDate > time) {
                 team.setStartDate(startDate);
             }
+           else{ return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("设置时间不正确");}
         } else {
             if (maxRecuitDate < 0) {
                 return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("最大招募时间不能为负数");
             }
+           team.setStartDate(null);
             team.setMaxRecuitDate(maxRecuitDate);
         }
         team.setCreateUserId(sessionService.getCurrentUserId());
