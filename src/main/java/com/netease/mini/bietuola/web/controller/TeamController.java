@@ -237,8 +237,8 @@ public class TeamController {
     @RequestMapping("/search")
     public JsonResponse searchTeam(String name) {
         List<RecomTeamInfo> teamList = new ArrayList<>();
-        if (StringUtil.isNotEmpty(name)) {
-            teamList = teamService.searchTeam(name);
+        if (StringUtils.isNotBlank(name)) {
+            teamList = teamService.searchTeam(name.trim());
         }
         return JsonResponse.success(teamList);
     }
@@ -253,8 +253,8 @@ public class TeamController {
     @RequestMapping("/find")
     public JsonResponse findTeam(TeamStatus teamStatus, String name) {
         List<TeamDetailVo> teams = new ArrayList<>();
-        if (StringUtil.isNotEmpty(name)) {
-            teams = teamService.findTeam(teamStatus, name);
+        if (StringUtils.isNotBlank(name)) {
+            teams = teamService.findTeam(teamStatus, name.trim());
         }
         return JsonResponse.success(teams);
     }
