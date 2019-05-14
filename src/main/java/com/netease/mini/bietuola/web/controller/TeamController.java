@@ -66,7 +66,7 @@ public class TeamController {
             if (StringUtils.isBlank(name)) {
                 return JsonResponse.codeOf(ResultCode.ERROR_UNKNOWN).setMsg("小组名不能为特殊字符");
             } else {
-                team.setName(name);
+                team.setName(name.trim());
             }
         }
         if (HttpUtils.checkUrl(avatarUrl)) {
