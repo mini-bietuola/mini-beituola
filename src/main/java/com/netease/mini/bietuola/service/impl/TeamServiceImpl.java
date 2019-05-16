@@ -454,7 +454,12 @@ public class TeamServiceImpl implements TeamService {
         }
         long endTime = team.getStartDate() + team.getDuration() * DateUtils.MILLIS_PER_DAY;
         long currentDay = System.currentTimeMillis() > endTime ? endTime : DateUtil.getDayZeroTime(System.currentTimeMillis());
-        int betweenDays = DateUtil.getBetweenDays(team.getStartDate(), currentDay);
+        int betweenDays =0;
+        if(currentDay!=endTime){
+            betweenDays = DateUtil.getBetweenDays(team.getStartDate(),System.currentTimeMillis());
+        }else {
+            betweenDays = DateUtil.getBetweenDays(team.getStartDate(), currentDay);
+        }
         for (int i = 0; i < betweenDays; i++) {
             DateCheck dateCheck = new DateCheck();
             long date = DateUtil.getTimeOffsetDays(team.getStartDate(), i);

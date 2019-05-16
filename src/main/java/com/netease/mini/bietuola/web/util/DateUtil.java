@@ -133,6 +133,9 @@ public class DateUtil {
     }
 
     public static int getBetweenDays(long startTime, long endTime){
-        return (int)((endTime-startTime)/DateUtils.MILLIS_PER_DAY);
+        double time=(double)(endTime-startTime);
+        double tmp=Math.ceil((time/DateUtils.MILLIS_PER_DAY));
+        int day =(int) tmp;
+        return day;
     }
 }
