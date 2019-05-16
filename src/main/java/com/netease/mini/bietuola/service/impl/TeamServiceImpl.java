@@ -327,8 +327,6 @@ public class TeamServiceImpl implements TeamService {
                 List<CheckDetailVo> checkDetailVoList = new ArrayList<CheckDetailVo>();
 
                 int unit_score = categoryMapper.selectScoreById(team.getCategoryId());
-                int myCheckTime = 0;
-                int myScore = 0;
                 int totalScore = 0;
                 for (User tempUser : userList) {
                     int checkTime = checkRecordMapper.CountCheckTimeByUserId(tempUser.getId(), teamId);
@@ -337,12 +335,7 @@ public class TeamServiceImpl implements TeamService {
                     totalScore += tempScore;
                 }
                 teamVo.setCheckDetailList(checkDetailVoList);
-                teamVo.setMyCheckTime(myCheckTime);
-                teamVo.setMyCheckscore(myScore);
                 teamVo.setTotlescore(totalScore);
-                if (team.getActivityStatus() == TeamStatus.FINISHED) {
-                    teamVo.setAwardAmount(userTeamMapper.selectAwardAmountByUserIdTeamId(userId, teamId).toString());
-                }
             }
             //招募中状态只查询小组成员信息
             else {
@@ -364,20 +357,18 @@ public class TeamServiceImpl implements TeamService {
                 teamVo.setCurrentDay(currentDay);
             }
 
-
             //将teamVo放入redis缓存，过期时间一天
             redisService.set(Constants.TEAM_DETAIL_PREFIX + teamId, teamVo, 60 * 60 * 24);
         } else {
             teamVo = redisTeamVo;
         }
-
-        teamVo = AssembleMyCheckInfo(teamVo, userId);
+        teamVo = AssembleMyCheckInfo(teamVo, userId, teamId);
 
         return JsonResponse.success(teamVo);
     }
 
-    //装配个人打卡次数和个人打卡积分
-    private TeamBaseInfoVo AssembleMyCheckInfo(TeamBaseInfoVo teamVo, Long userId) {
+    //装配个人打卡次数、个人打卡积分及获得金钱数量
+    private TeamBaseInfoVo AssembleMyCheckInfo(TeamBaseInfoVo teamVo, Long userId, Long teamId) {
         if (teamVo.getTeam().getActivityStatus() == TeamStatus.PROCCESSING || teamVo.getTeam().getActivityStatus() == TeamStatus.FINISHED) {
             for (CheckDetailVo tempCheckVo : teamVo.getCheckDetailList()) {
                 if (Objects.equals(tempCheckVo.getUser().getId(), userId)) {
@@ -385,6 +376,9 @@ public class TeamServiceImpl implements TeamService {
                     teamVo.setMyCheckscore(tempCheckVo.getScore());
                     break;
                 }
+            }
+            if (teamVo.getTeam().getActivityStatus() == TeamStatus.FINISHED) {
+                teamVo.setAwardAmount(userTeamMapper.selectAwardAmountByUserIdTeamId(userId, teamId).toString());
             }
         }
         return teamVo;
